@@ -35,31 +35,60 @@ export default function Welcome({ auth, testimonials = [], learnerCount = 0 }) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
             <Head>
-                <title>NelnadoSolutions Academy — Learn Tech Skills</title>
+                <title>
+                    NelnadoSolutions — Database & Cloud IT Training | Oracle
+                    DBA, AWS, Azure
+                </title>
                 <meta
                     name="description"
-                    content="Master AWS, Oracle, Database Management, and more from industry experts. Get certified and advance your career with NelnadoSolutions Academy."
+                    content="Professional IT training in Database Management (Oracle DBA, MySQL, PostgreSQL) and Cloud Computing (AWS, Azure, Google Cloud). Expert-led courses for IT professionals seeking certification and career advancement."
                 />
-                <link rel="canonical" href="/" />
+                <meta
+                    name="keywords"
+                    content="Oracle DBA training, AWS certification, Azure cloud training, database administrator course, cloud computing training, IT professional development, Oracle database training, cloud architecture certification"
+                />
+                <link rel="canonical" href="https://nelnadosolutions.com/" />
+                <meta property="og:site_name" content="NelnadoSolutions" />
                 <meta
                     property="og:title"
-                    content="NelnadoSolutions Academy — Learn Tech Skills"
+                    content="NelnadoSolutions — Database & Cloud IT Training"
                 />
                 <meta
                     property="og:description"
-                    content="Master AWS, Oracle, Database Management, and more from industry experts."
+                    content="Professional IT training in Database Management and Cloud Computing. Oracle DBA, AWS, Azure certification courses."
                 />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="/" />
+                <meta
+                    property="og:url"
+                    content="https://nelnadosolutions.com/"
+                />
+                <meta property="og:locale" content="en_US" />
                 <meta name="twitter:card" content="summary_large_image" />
                 <meta
                     name="twitter:title"
-                    content="NelnadoSolutions Academy — Learn Tech Skills"
+                    content="NelnadoSolutions — Database & Cloud IT Training"
                 />
                 <meta
                     name="twitter:description"
-                    content="Master AWS, Oracle, Database Management, and more from industry experts."
+                    content="Professional IT training in Database Management and Cloud Computing. Oracle DBA, AWS, Azure certification courses."
                 />
+                <script type="application/ld+json">{`
+                    {
+                        "@context": "https://schema.org",
+                        "@type": "EducationalOrganization",
+                        "name": "NelnadoSolutions",
+                        "url": "https://nelnadosolutions.com",
+                        "description": "Professional IT training platform specializing in Database Management and Cloud Computing",
+                        "areaServed": "Worldwide",
+                        "teaches": [
+                            "Oracle Database Administration",
+                            "AWS Cloud Computing",
+                            "Azure Cloud Services",
+                            "Database Management",
+                            "Cloud Architecture"
+                        ]
+                    }
+                `}</script>
             </Head>
             <Navbar auth={auth} />
             {/* Hero */}
