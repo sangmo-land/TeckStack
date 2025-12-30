@@ -293,7 +293,6 @@ export default function Welcome({ auth, testimonials = [], learnerCount = 0 }) {
                         ))}
                     </div>
                 </div>
-                <span>Hope this works</span>
             </section>
 
             {/* CTA */}
