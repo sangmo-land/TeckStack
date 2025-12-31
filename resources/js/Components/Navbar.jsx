@@ -22,15 +22,20 @@ export default function Navbar({ auth, startSolid = false }) {
     const isSolid = startSolid || isScrolled;
 
     return (
-        <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-            isSolid
-                ? 'bg-slate-900/95 backdrop-blur-lg shadow-lg shadow-black/20 border-b border-slate-800'
-                : 'bg-transparent'
-        }`}>
+        <nav
+            className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+                isSolid
+                    ? "bg-slate-900/95 backdrop-blur-lg shadow-lg shadow-black/20 border-b border-slate-800"
+                    : "bg-transparent"
+            }`}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-20">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center space-x-3 group">
+                    <Link
+                        href="/"
+                        className="flex items-center space-x-3 group"
+                    >
                         <div className="relative">
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg blur-lg opacity-75 group-hover:opacity-100 transition-opacity" />
                             <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg">
@@ -44,7 +49,9 @@ export default function Navbar({ auth, startSolid = false }) {
 
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center space-x-1">
-                        <NavItem href="/courses" icon={BookOpen}>Courses</NavItem>
+                        <NavItem href="/courses" icon={BookOpen}>
+                            Courses
+                        </NavItem>
                         <NavItem href="/about">About</NavItem>
                         <NavItem href="/instructors">Instructors</NavItem>
                         <NavItem href="/contact">Contact</NavItem>
@@ -83,24 +90,39 @@ export default function Navbar({ auth, startSolid = false }) {
                                         <button className="flex items-center space-x-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-all duration-200 group">
                                             <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                                                 <span className="text-white text-sm font-semibold">
-                                                    {auth.user.name.charAt(0).toUpperCase()}
+                                                    {auth.user.name
+                                                        .charAt(0)
+                                                        .toUpperCase()}
                                                 </span>
                                             </div>
-                                            <span className="text-white text-sm font-medium">{auth.user.name}</span>
+                                            <span className="text-white text-sm font-medium">
+                                                {auth.user.name}
+                                            </span>
                                             <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
                                         </button>
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content align="right" width="48">
-                                        <Dropdown.Link href="/dashboard" className="flex items-center space-x-2">
+                                        <Dropdown.Link
+                                            href="/dashboard"
+                                            className="flex items-center space-x-2"
+                                        >
                                             <GraduationCap className="w-4 h-4" />
                                             <span>Dashboard</span>
                                         </Dropdown.Link>
-                                        <Dropdown.Link href="/profile" className="flex items-center space-x-2">
+                                        <Dropdown.Link
+                                            href="/profile"
+                                            className="flex items-center space-x-2"
+                                        >
                                             <UserCircle className="w-4 h-4" />
                                             <span>Profile</span>
                                         </Dropdown.Link>
-                                        <Dropdown.Link href="/logout" method="post" as="button" className="flex items-center space-x-2">
+                                        <Dropdown.Link
+                                            href="/logout"
+                                            method="post"
+                                            as="button"
+                                            className="flex items-center space-x-2"
+                                        >
                                             <LogOut className="w-4 h-4" />
                                             <span>Sign Out</span>
                                         </Dropdown.Link>
@@ -130,7 +152,11 @@ export default function Navbar({ auth, startSolid = false }) {
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
                     >
-                        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                        {isMobileMenuOpen ? (
+                            <X className="w-6 h-6" />
+                        ) : (
+                            <Menu className="w-6 h-6" />
+                        )}
                     </button>
                 </div>
 
@@ -147,10 +173,14 @@ export default function Navbar({ auth, startSolid = false }) {
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
+                                    if (e.key === "Enter") {
                                         const q = searchText.trim();
                                         if (q) {
-                                            router.visit(`/courses?search=${encodeURIComponent(q)}`);
+                                            router.visit(
+                                                `/courses?search=${encodeURIComponent(
+                                                    q
+                                                )}`
+                                            );
                                             setIsSearchOpen(false);
                                         }
                                     }
@@ -175,10 +205,14 @@ export default function Navbar({ auth, startSolid = false }) {
                                 value={searchText}
                                 onChange={(e) => setSearchText(e.target.value)}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
+                                    if (e.key === "Enter") {
                                         const q = searchText.trim();
                                         if (q) {
-                                            router.visit(`/courses?search=${encodeURIComponent(q)}`);
+                                            router.visit(
+                                                `/courses?search=${encodeURIComponent(
+                                                    q
+                                                )}`
+                                            );
                                             setIsMobileMenuOpen(false);
                                         }
                                     }
@@ -186,9 +220,13 @@ export default function Navbar({ auth, startSolid = false }) {
                             />
                         </div>
 
-                        <MobileNavItem href="/courses" icon={BookOpen}>Courses</MobileNavItem>
+                        <MobileNavItem href="/courses" icon={BookOpen}>
+                            Courses
+                        </MobileNavItem>
                         <MobileNavItem href="/about">About</MobileNavItem>
-                        <MobileNavItem href="/instructors">Instructors</MobileNavItem>
+                        <MobileNavItem href="/instructors">
+                            Instructors
+                        </MobileNavItem>
                         <MobileNavItem href="/contact">Contact</MobileNavItem>
                         <MobileNavItem href="/pricing">Pricing</MobileNavItem>
 
@@ -201,22 +239,38 @@ export default function Navbar({ auth, startSolid = false }) {
                                     >
                                         <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                                             <span className="text-white font-semibold">
-                                                {auth.user.name.charAt(0).toUpperCase()}
+                                                {auth.user.name
+                                                    .charAt(0)
+                                                    .toUpperCase()}
                                             </span>
                                         </div>
                                         <div>
-                                            <p className="text-white font-medium">{auth.user.name}</p>
-                                            <p className="text-slate-400 text-sm">View Dashboard</p>
+                                            <p className="text-white font-medium">
+                                                {auth.user.name}
+                                            </p>
+                                            <p className="text-slate-400 text-sm">
+                                                View Dashboard
+                                            </p>
                                         </div>
                                     </Link>
                                     <Link
                                         href="/cart"
                                         className="flex items-center justify-between px-4 py-3 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors"
                                     >
-                                        <span className="text-white font-medium">Cart</span>
+                                        <span className="text-white font-medium">
+                                            Cart
+                                        </span>
                                         <span className="bg-blue-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
                                             3
                                         </span>
+                                    </Link>
+                                    <Link
+                                        href="/logout"
+                                        method="post"
+                                        as="button"
+                                        className="w-full text-left px-4 py-3 bg-slate-800 rounded-lg hover:bg-slate-700 text-slate-200 font-medium transition-colors"
+                                    >
+                                        Sign Out
                                     </Link>
                                 </>
                             ) : (

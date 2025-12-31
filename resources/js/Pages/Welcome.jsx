@@ -92,7 +92,7 @@ export default function Welcome({ auth, testimonials = [], learnerCount = 0 }) {
             </Head>
             <Navbar auth={auth} />
             {/* Hero */}
-            <section className="relative overflow-hidden px-4 sm:px-6 lg:px-8 pt-28 pb-20">
+            <section className="relative overflow-hidden px-4 sm:px-6 lg:px-8 pt-28 pb-12 sm:pb-16 lg:pb-20">
                 <div className="absolute inset-0">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl" />
                     <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
@@ -101,61 +101,54 @@ export default function Welcome({ auth, testimonials = [], learnerCount = 0 }) {
 
                 <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
                     <div>
-                        <div className="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-6">
-                            <Sparkles className="w-4 h-4 text-blue-400" />
-                            <span className="text-blue-400 text-sm font-medium">
-                                Trusted by {learnerDisplay} learners worldwide
-                            </span>
-                        </div>
-                        <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                            Learn the skills to build your future
-                            <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                                with NelnadoSolutions Academy
+                        <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight">
+                            Master Cloud & Database
+                            <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mt-1">
+                                Build Your Career
                             </span>
                         </h1>
-                        <p className="text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl">
-                            Master AWS, Oracle, databases, cloud, and software
-                            engineering with expert-led courses and hands-on
-                            projects.
+                        <p className="text-base sm:text-lg lg:text-xl text-slate-300 mb-6 sm:mb-8 leading-relaxed max-w-2xl">
+                            Expert-led training in AWS, Oracle, and modern cloud
+                            technologies.
                         </p>
-                        <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                             <Link
                                 href="/courses"
-                                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
+                                className="w-full sm:w-auto text-center px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
                             >
                                 Browse Courses
                             </Link>
                             {auth.user ? (
                                 <Link
                                     href="/dashboard"
-                                    className="px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:border-white transition-colors"
+                                    className="w-full sm:w-auto text-center px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:border-white transition-colors"
                                 >
                                     Go to Dashboard
                                 </Link>
                             ) : (
                                 <Link
                                     href="/register"
-                                    className="px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:border-white transition-colors"
+                                    className="w-full sm:w-auto text-center px-8 py-4 border-2 border-white/30 text-white font-semibold rounded-lg hover:border-white transition-colors"
                                 >
                                     Get Started Free
                                 </Link>
                             )}
                         </div>
-                        <div className="mt-8 flex items-center gap-6 text-slate-400">
+                        <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-4 sm:gap-6 text-slate-400 text-sm sm:text-base">
                             <div className="flex items-center gap-2">
-                                <Users className="w-5 h-5" /> {learnerDisplay}{" "}
-                                learners
+                                <Users className="w-4 h-4 sm:w-5 sm:h-5" />{" "}
+                                {learnerDisplay} learners
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="hidden sm:flex items-center gap-2">
                                 <Award className="w-5 h-5" /> Certifications
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="hidden md:flex items-center gap-2">
                                 <ShieldCheck className="w-5 h-5" /> Verified
                                 content
                             </div>
                         </div>
                     </div>
-                    <div className="relative">
+                    <div className="relative hidden lg:block">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl blur-3xl opacity-20" />
                         <div className="relative bg-slate-800/60 backdrop-blur-sm border border-slate-700 rounded-3xl p-8">
                             <div className="grid grid-cols-2 gap-6">
@@ -188,7 +181,7 @@ export default function Welcome({ auth, testimonials = [], learnerCount = 0 }) {
             </section>
 
             {/* Trending Courses */}
-            <section className="px-4 sm:px-6 lg:px-8 py-16">
+            <section className="px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16 bg-gradient-to-b from-slate-900/15 via-slate-900/10 to-slate-900/25 backdrop-blur-sm border-y border-slate-800/60">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-center justify-between mb-8">
                         <h2 className="text-3xl font-bold text-white">
@@ -281,7 +274,7 @@ export default function Welcome({ auth, testimonials = [], learnerCount = 0 }) {
             </section>
 
             {/* Testimonials */}
-            <section className="px-4 sm:px-6 lg:px-8 py-16 bg-slate-800/40 border-y border-slate-700">
+            <section className="px-4 sm:px-6 lg:px-8 py-16 bg-slate-950/70 border-y border-slate-800">
                 <div className="max-w-7xl mx-auto">
                     <h2 className="text-3xl font-bold text-white mb-8 text-center">
                         What learners say
@@ -327,9 +320,9 @@ export default function Welcome({ auth, testimonials = [], learnerCount = 0 }) {
             {/* CTA */}
             <section className="px-4 sm:px-6 lg:px-8 py-20">
                 <div className="max-w-7xl mx-auto">
-                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl p-12 md:p-16">
-                        <div className="absolute inset-0 bg-black/20" />
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
+                    <div className="relative overflow-hidden bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-600 rounded-3xl p-12 md:p-16">
+                        <div className="absolute inset-0 bg-black/10" />
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400/20 rounded-full blur-3xl" />
                         <div className="relative text-center max-w-3xl mx-auto">
                             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
                                 Ready to transform your career?
