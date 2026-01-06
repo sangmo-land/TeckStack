@@ -69,10 +69,17 @@ public function edit($id)
             'level' => 'required|in:beginner,intermediate,advanced',
             'price' => 'nullable|numeric|min:0',
             'language' => 'nullable|string',
+'thumbnail_url' => 'nullable',
             'learning_outcomes' => 'nullable|array',
             'requirements' => 'nullable|array',
             'is_published' => 'boolean',
         ]);
+if ($request->hasFile('thumbnail_url')) {
+$path = $request->file('thumbnail_url')->store('course-thumbnails', 'public');
+$validated['thumbnail_url'] = '/storage/' . $path;
+} else {
+unset($validated['thumbnail_url']);
+}
         
         $course->update($validated);
         

@@ -9,34 +9,35 @@ export default function EditCourse({ course }) {
     const [outcomes, setOutcomes] = useState(course.learning_outcomes || ['']);
     const [requirements, setRequirements] = useState(course.requirements || ['']);
 
-    const { data, setData, patch, errors, processing } = useForm({
-        title: course.title || '',
-        description: course.description || '',
-        overview: course.overview || '',
-        category: course.category || '',
-        level: course.level || 'beginner',
-        price: course.price || '',
-        language: course.language || 'English',
-        thumbnail_url: course.thumbnail_url || '',
+    const { data, setData, post, transform, errors, processing } = useForm({
+        _method: "PATCH",
+        title: course.title || "",
+        description: course.description || "",
+        overview: course.overview || "",
+        category: course.category || "",
+        level: course.level || "beginner",
+        price: course.price || "",
+        language: course.language || "English",
+        thumbnail_url: course.thumbnail_url || "",
         learning_outcomes: course.learning_outcomes || [],
         requirements: course.requirements || [],
         is_published: course.is_published || false,
     });
 
     const categories = [
-        'Web Development',
-        'Mobile Development',
-        'Data Science',
-        'Machine Learning',
-        'AI & ChatGPT',
-        'Cloud Computing',
-        'DevOps',
-        'Cybersecurity',
-        'Blockchain',
-        'Other',
+        "Web Development",
+        "Mobile Development",
+        "Data Science",
+        "Machine Learning",
+        "AI & ChatGPT",
+        "Cloud Computing",
+        "DevOps",
+        "Cybersecurity",
+        "Blockchain",
+        "Other",
     ];
 
-    const levels = ['beginner', 'intermediate', 'advanced'];
+    const levels = ["beginner", "intermediate", "advanced"];
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -44,22 +45,24 @@ export default function EditCourse({ course }) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 setPreview(e.target.result);
-                setData('thumbnail_url', file.name);
+                setData("thumbnail_url", file);
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const addOutcome = () => setOutcomes([...outcomes, '']);
-    const removeOutcome = (index) => setOutcomes(outcomes.filter((_, i) => i !== index));
+    const addOutcome = () => setOutcomes([...outcomes, ""]);
+    const removeOutcome = (index) =>
+        setOutcomes(outcomes.filter((_, i) => i !== index));
     const updateOutcome = (index, value) => {
         const updated = [...outcomes];
         updated[index] = value;
         setOutcomes(updated);
     };
 
-    const addRequirement = () => setRequirements([...requirements, '']);
-    const removeRequirement = (index) => setRequirements(requirements.filter((_, i) => i !== index));
+    const addRequirement = () => setRequirements([...requirements, ""]);
+    const removeRequirement = (index) =>
+        setRequirements(requirements.filter((_, i) => i !== index));
     const updateRequirement = (index, value) => {
         const updated = [...requirements];
         updated[index] = value;
@@ -71,13 +74,13 @@ export default function EditCourse({ course }) {
         const filteredOutcomes = outcomes.filter((o) => o.trim());
         const filteredRequirements = requirements.filter((r) => r.trim());
 
-        patch(route('courses.update', course.id), {
-            data: {
-                ...data,
-                learning_outcomes: filteredOutcomes,
-                requirements: filteredRequirements,
-            },
-        });
+        transform((data) => ({
+            ...data,
+            learning_outcomes: filteredOutcomes,
+            requirements: filteredRequirements,
+        }));
+
+        post(route("courses.update", course.id));
     };
 
     return (
