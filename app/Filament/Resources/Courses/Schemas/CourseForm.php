@@ -104,7 +104,8 @@ class CourseForm
                             ->maxSize(2048)
                             ->disk('public')
                             ->directory('course-thumbnails')
-                            ->deletable()
+->deletable(true)
+                            ->downloadable(true)
                             ->columnSpanFull()
                             ->helperText('Upload a thumbnail image (max 2MB). Drag and drop supported.'),
                         
@@ -113,7 +114,8 @@ class CourseForm
                             ->imageEditor()
                             ->disk('public')
                             ->directory('course-covers')
-                            ->deletable()
+->deletable(true)
+                            ->downloadable(true)
                             ->columnSpanFull(),
                     ])->columns(2),
                 
