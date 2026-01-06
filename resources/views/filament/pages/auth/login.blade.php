@@ -1,8 +1,3 @@
-<x-filament-panels::layout.base :livewire="$this">
-    @slot('bodyAttributes')
-    class="bg-slate-950 font-sans antialiased"
-    @endslot
-
     <div
         class="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
         {{-- Animated Background Effects --}}
@@ -45,5 +40,4 @@
                 </p>
             </div>
         </div>
-    </div>
-</x-filament-panels::layout.base>
+</div>

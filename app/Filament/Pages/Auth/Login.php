@@ -13,6 +13,10 @@ class Login extends AuthLogin
 {
     protected string $view = 'filament.pages.auth.login';
 
+public function getLayout(): string
+    {
+        return 'filament.pages.auth.login_layout';
+    }
     public function authenticate(): ?LoginResponse
     {
         $data = $this->form->getState();
