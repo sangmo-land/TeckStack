@@ -232,7 +232,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
-        if (!$user->isInstructor()) {
+if (!$user->isInstructor() && !$user->isAdmin()) {
             abort(403);
         }
 

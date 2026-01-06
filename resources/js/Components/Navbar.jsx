@@ -103,6 +103,16 @@ export default function Navbar({ auth, startSolid = false }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content align="right" width="48">
+                                        {(auth.user.role === "instructor" ||
+                                            auth.user.role === "admin") && (
+                                            <Dropdown.Link
+                                                href="/instructor/dashboard"
+                                                className="flex items-center space-x-2"
+                                            >
+                                                <BookOpen className="w-4 h-4" />
+                                                <span>Teaching Dashboard</span>
+                                            </Dropdown.Link>
+                                        )}
                                         <Dropdown.Link
                                             href="/dashboard"
                                             className="flex items-center space-x-2"

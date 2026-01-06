@@ -634,13 +634,17 @@ export default function Dashboard() {
             <Head title="Dashboard" />
 
             {/* Student Dashboard Section */}
-            {userRole === 'student' && (
+            {userRole === "student" && (
                 <>
                     {/* Student Header */}
                     <section className="px-4 sm:px-6 lg:px-8 pt-12 pb-8 border-b border-slate-700 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
                         <div className="max-w-7xl mx-auto">
-                            <h1 className="text-4xl font-bold text-white mb-2">My Learning</h1>
-                            <p className="text-slate-400">Track your progress and continue learning</p>
+                            <h1 className="text-4xl font-bold text-white mb-2">
+                                My Learning
+                            </h1>
+                            <p className="text-slate-400">
+                                Track your progress and continue learning
+                            </p>
                         </div>
                     </section>
 
@@ -648,10 +652,26 @@ export default function Dashboard() {
                     <section className="px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
                         <div className="max-w-7xl mx-auto">
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                                <StudentStatCard icon={<BookOpen />} label="Enrolled Courses" value={totalCourses || 0} />
-                                <StudentStatCard icon={<Clock />} label="In Progress" value={inProgressCount || 0} />
-                                <StudentStatCard icon={<Trophy />} label="Completed" value={completedCoursesCount || 0} />
-                                <StudentStatCard icon={<Heart />} label="Wishlist" value={wishlistCount || 0} />
+                                <StudentStatCard
+                                    icon={<BookOpen />}
+                                    label="Enrolled Courses"
+                                    value={totalCourses || 0}
+                                />
+                                <StudentStatCard
+                                    icon={<Clock />}
+                                    label="In Progress"
+                                    value={inProgressCount || 0}
+                                />
+                                <StudentStatCard
+                                    icon={<Trophy />}
+                                    label="Completed"
+                                    value={completedCoursesCount || 0}
+                                />
+                                <StudentStatCard
+                                    icon={<Heart />}
+                                    label="Wishlist"
+                                    value={wishlistCount || 0}
+                                />
                             </div>
                         </div>
                     </section>
@@ -661,18 +681,27 @@ export default function Dashboard() {
                         <div className="max-w-7xl mx-auto">
                             {enrollments?.length > 0 ? (
                                 <>
-                                    <h2 className="text-2xl font-bold text-white mb-6">Continue Learning</h2>
+                                    <h2 className="text-2xl font-bold text-white mb-6">
+                                        Continue Learning
+                                    </h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {enrollments.map(enrollment => (
-                                            <EnrollmentCard key={enrollment.id} enrollment={enrollment} />
+                                        {enrollments.map((enrollment) => (
+                                            <EnrollmentCard
+                                                key={enrollment.id}
+                                                enrollment={enrollment}
+                                            />
                                         ))}
                                     </div>
                                 </>
                             ) : (
                                 <div className="text-center py-16">
                                     <BookOpen className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                                    <h2 className="text-2xl font-bold text-white mb-2">No Courses Yet</h2>
-                                    <p className="text-slate-400 mb-6">Start your learning journey today!</p>
+                                    <h2 className="text-2xl font-bold text-white mb-2">
+                                        No Courses Yet
+                                    </h2>
+                                    <p className="text-slate-400 mb-6">
+                                        Start your learning journey today!
+                                    </p>
                                     <Link
                                         href="/courses"
                                         className="inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
@@ -687,14 +716,19 @@ export default function Dashboard() {
             )}
 
             {/* Instructor Dashboard Section */}
-            {userRole === 'instructor' && (
+            {userRole === "instructor" && (
                 <>
                     {/* Instructor Header */}
                     <section className="px-4 sm:px-6 lg:px-8 pt-12 pb-8 border-b border-slate-700 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
                         <div className="max-w-7xl mx-auto flex justify-between items-center">
                             <div>
-                                <h1 className="text-4xl font-bold text-white mb-2">Teaching Dashboard</h1>
-                                <p className="text-slate-400">Manage your courses and track student progress</p>
+                                <h1 className="text-4xl font-bold text-white mb-2">
+                                    Teaching Dashboard
+                                </h1>
+                                <p className="text-slate-400">
+                                    Manage your courses and track student
+                                    progress
+                                </p>
                             </div>
                             <Link
                                 href="/dashboard/create-course"
@@ -709,10 +743,30 @@ export default function Dashboard() {
                     <section className="px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
                         <div className="max-w-7xl mx-auto">
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                                <StatCard icon={<BookOpen />} label="Total Courses" value={instructorCourses?.length || 0} color="blue" />
-                                <StatCard icon={<Users />} label="Total Students" value={totalStudents || 0} color="purple" />
-                                <StatCard icon={<Star />} label="Average Rating" value={averageRating || 0} color="yellow" />
-                                <StatCard icon={<TrendingUp />} label="Total Reviews" value={totalReviews || 0} color="green" />
+                                <StatCard
+                                    icon={<BookOpen />}
+                                    label="Total Courses"
+                                    value={instructorCourses?.length || 0}
+                                    color="blue"
+                                />
+                                <StatCard
+                                    icon={<Users />}
+                                    label="Total Students"
+                                    value={totalStudents || 0}
+                                    color="purple"
+                                />
+                                <StatCard
+                                    icon={<Star />}
+                                    label="Average Rating"
+                                    value={averageRating || 0}
+                                    color="yellow"
+                                />
+                                <StatCard
+                                    icon={<TrendingUp />}
+                                    label="Total Reviews"
+                                    value={totalReviews || 0}
+                                    color="green"
+                                />
                             </div>
                         </div>
                     </section>
@@ -720,19 +774,29 @@ export default function Dashboard() {
                     {/* Instructor Courses */}
                     <section className="px-4 sm:px-6 lg:px-8 py-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
                         <div className="max-w-7xl mx-auto">
-                            <h2 className="text-2xl font-bold text-white mb-6">My Courses</h2>
+                            <h2 className="text-2xl font-bold text-white mb-6">
+                                My Courses
+                            </h2>
 
                             {instructorCourses?.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {instructorCourses.map(course => (
-                                        <CourseCard key={course.id} course={course} />
+                                    {instructorCourses.map((course) => (
+                                        <CourseCard
+                                            key={course.id}
+                                            course={course}
+                                        />
                                     ))}
                                 </div>
                             ) : (
                                 <div className="text-center py-16 bg-slate-800 border border-slate-700 rounded-lg">
                                     <BookOpen className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                                    <h3 className="text-xl font-bold text-white mb-2">No Courses Yet</h3>
-                                    <p className="text-slate-400 mb-6">Create your first course to start teaching!</p>
+                                    <h3 className="text-xl font-bold text-white mb-2">
+                                        No Courses Yet
+                                    </h3>
+                                    <p className="text-slate-400 mb-6">
+                                        Create your first course to start
+                                        teaching!
+                                    </p>
                                     <Link
                                         href="/dashboard/create-course"
                                         className="inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
@@ -747,7 +811,9 @@ export default function Dashboard() {
                     <div className="px-4 sm:px-6 lg:px-8 py-8">
                         <div className="bg-white dark:bg-gray-800 rounded-lg border-t-4 border-slate-600 p-6 mb-8">
                             <p className="text-gray-600 dark:text-gray-300 text-center">
-                                Below is the course hierarchy management section. You can view and edit chapter structures here.
+                                Below is the course hierarchy management
+                                section. You can view and edit chapter
+                                structures here.
                             </p>
                         </div>
                     </div>
@@ -758,11 +824,28 @@ export default function Dashboard() {
                 <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                     <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                         <div>
-                            <p className="text-sm font-medium uppercase tracking-wide text-primary-600">Overview</p>
-                            <h1 className="mt-1 text-3xl font-semibold text-gray-900">Learning Performance</h1>
-                            <p className="mt-2 text-sm text-gray-600">Real-time health of your courses, learners, and content.</p>
+                            <p className="text-sm font-medium uppercase tracking-wide text-primary-600">
+                                Overview
+                            </p>
+                            <h1 className="mt-1 text-3xl font-semibold text-gray-900">
+                                Learning Performance
+                            </h1>
+                            <p className="mt-2 text-sm text-gray-600">
+                                Real-time health of your courses, learners, and
+                                content.
+                            </p>
                         </div>
                         <div className="flex items-center gap-2">
+                            {(userRole === "instructor" ||
+                                userRole === "admin") && (
+                                <Link
+                                    href="/instructor/dashboard"
+                                    className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2"
+                                >
+                                    <BookOpen className="h-4 w-4" />
+                                    Teaching Dashboard
+                                </Link>
+                            )}
                             <button className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
                                 Export
                             </button>
@@ -776,13 +859,22 @@ export default function Dashboard() {
                         {kpis.map((item) => {
                             const Icon = item.icon;
                             return (
-                                <div key={item.label} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+                                <div
+                                    key={item.label}
+                                    className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100"
+                                >
                                     <div className="flex items-center justify-between">
-                                        <Badge tone={item.tone}>{item.label}</Badge>
+                                        <Badge tone={item.tone}>
+                                            {item.label}
+                                        </Badge>
                                         <Icon className="h-5 w-5 text-gray-400" />
                                     </div>
-                                    <div className="mt-3 text-2xl font-semibold text-gray-900">{item.value}</div>
-                                    <div className="mt-1 text-sm text-gray-500">{item.change}</div>
+                                    <div className="mt-3 text-2xl font-semibold text-gray-900">
+                                        {item.value}
+                                    </div>
+                                    <div className="mt-1 text-sm text-gray-500">
+                                        {item.change}
+                                    </div>
                                 </div>
                             );
                         })}
@@ -793,105 +885,177 @@ export default function Dashboard() {
                             <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-50 dark:ring-gray-800">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">Course Hierarchy</p>
-                                        <p className="text-xs text-gray-600 dark:text-gray-300">Select a course to view chapters</p>
+                                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
+                                            Course Hierarchy
+                                        </p>
+                                        <p className="text-xs text-gray-600 dark:text-gray-300">
+                                            Select a course to view chapters
+                                        </p>
                                     </div>
                                     <select
                                         className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-50"
-                                        value={course?.id || ''}
-                                        onChange={(e) => router.get(route('dashboard'), { course_id: e.target.value || undefined }, { preserveState: true, replace: true })}
+                                        value={course?.id || ""}
+                                        onChange={(e) =>
+                                            router.get(
+                                                route("dashboard"),
+                                                {
+                                                    course_id:
+                                                        e.target.value ||
+                                                        undefined,
+                                                },
+                                                {
+                                                    preserveState: true,
+                                                    replace: true,
+                                                }
+                                            )
+                                        }
                                     >
                                         <option value="">Latest Course</option>
                                         {coursesList?.map((c) => (
-                                            <option key={c.id} value={c.id}>{c.title}</option>
+                                            <option key={c.id} value={c.id}>
+                                                {c.title}
+                                            </option>
                                         ))}
                                     </select>
                                 </div>
                                 <div className="mt-4">
-                                    <CourseTree course={course} canEdit={canEditCourse} />
+                                    <CourseTree
+                                        course={course}
+                                        canEdit={canEditCourse}
+                                    />
                                 </div>
                             </div>
 
                             <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <p className="text-sm font-medium text-gray-700">Engagement Pulse</p>
-                                        <p className="text-xs text-gray-500">Past 7 days</p>
+                                        <p className="text-sm font-medium text-gray-700">
+                                            Engagement Pulse
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            Past 7 days
+                                        </p>
                                     </div>
-                                    <Badge tone="primary" className="flex items-center gap-2">
+                                    <Badge
+                                        tone="primary"
+                                        className="flex items-center gap-2"
+                                    >
                                         <Activity className="h-4 w-4" /> Live
                                     </Badge>
                                 </div>
                                 <div className="mt-6 h-48">
-                                    {engagementData && engagementData.length > 0 ? (
-                                        <ResponsiveContainer width="100%" height="100%">
+                                    {engagementData &&
+                                    engagementData.length > 0 ? (
+                                        <ResponsiveContainer
+                                            width="100%"
+                                            height="100%"
+                                        >
                                             <LineChart data={engagementData}>
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                                                <XAxis 
-                                                    dataKey="date" 
-                                                    tick={{ fill: '#64748b', fontSize: 12 }}
+                                                <CartesianGrid
+                                                    strokeDasharray="3 3"
+                                                    stroke="#e2e8f0"
+                                                />
+                                                <XAxis
+                                                    dataKey="date"
+                                                    tick={{
+                                                        fill: "#64748b",
+                                                        fontSize: 12,
+                                                    }}
                                                     stroke="#cbd5e1"
                                                 />
-                                                <YAxis 
-                                                    tick={{ fill: '#64748b', fontSize: 12 }}
+                                                <YAxis
+                                                    tick={{
+                                                        fill: "#64748b",
+                                                        fontSize: 12,
+                                                    }}
                                                     stroke="#cbd5e1"
                                                 />
-                                                <Tooltip 
-                                                    contentStyle={{ 
-                                                        backgroundColor: '#1e293b', 
-                                                        border: 'none', 
-                                                        borderRadius: '8px',
-                                                        color: '#fff'
+                                                <Tooltip
+                                                    contentStyle={{
+                                                        backgroundColor:
+                                                            "#1e293b",
+                                                        border: "none",
+                                                        borderRadius: "8px",
+                                                        color: "#fff",
                                                     }}
                                                 />
-                                                <Legend 
-                                                    wrapperStyle={{ fontSize: '12px' }}
+                                                <Legend
+                                                    wrapperStyle={{
+                                                        fontSize: "12px",
+                                                    }}
                                                 />
-                                                <Line 
-                                                    type="monotone" 
-                                                    dataKey="enrollments" 
-                                                    stroke="#3b82f6" 
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="enrollments"
+                                                    stroke="#3b82f6"
                                                     strokeWidth={2}
-                                                    dot={{ fill: '#3b82f6', r: 4 }}
+                                                    dot={{
+                                                        fill: "#3b82f6",
+                                                        r: 4,
+                                                    }}
                                                     name="Enrollments"
                                                 />
-                                                <Line 
-                                                    type="monotone" 
-                                                    dataKey="activity" 
-                                                    stroke="#8b5cf6" 
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="activity"
+                                                    stroke="#8b5cf6"
                                                     strokeWidth={2}
-                                                    dot={{ fill: '#8b5cf6', r: 4 }}
+                                                    dot={{
+                                                        fill: "#8b5cf6",
+                                                        r: 4,
+                                                    }}
                                                     name="Learning Activity"
                                                 />
                                             </LineChart>
                                         </ResponsiveContainer>
                                     ) : (
                                         <div className="h-full rounded-xl bg-gradient-to-r from-primary-50 via-white to-primary-50 ring-1 ring-gray-100 flex items-center justify-center">
-                                            <p className="text-sm text-gray-500">No engagement data available</p>
+                                            <p className="text-sm text-gray-500">
+                                                No engagement data available
+                                            </p>
                                         </div>
                                     )}
                                 </div>
                                 <div className="mt-4 flex items-center gap-3 text-sm text-gray-600">
                                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                    {engagementData && engagementData.length > 0 
-                                        ? `Tracking ${engagementData.reduce((sum, d) => sum + d.enrollments + d.activity, 0)} events this week`
-                                        : 'Stable engagement with slight uplift in completion rate.'}
+                                    {engagementData && engagementData.length > 0
+                                        ? `Tracking ${engagementData.reduce(
+                                              (sum, d) =>
+                                                  sum +
+                                                  d.enrollments +
+                                                  d.activity,
+                                              0
+                                          )} events this week`
+                                        : "Stable engagement with slight uplift in completion rate."}
                                 </div>
                             </div>
 
                             <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
                                 <div className="flex items-center justify-between">
-                                    <p className="text-sm font-medium text-gray-700">Recent Activity</p>
-                                    <button className="text-sm font-medium text-primary-600 hover:text-primary-700">View all</button>
+                                    <p className="text-sm font-medium text-gray-700">
+                                        Recent Activity
+                                    </p>
+                                    <button className="text-sm font-medium text-primary-600 hover:text-primary-700">
+                                        View all
+                                    </button>
                                 </div>
                                 <div className="mt-4 space-y-4">
                                     {activity.map((item) => (
-                                        <div key={item.title} className="flex items-start justify-between gap-4">
+                                        <div
+                                            key={item.title}
+                                            className="flex items-start justify-between gap-4"
+                                        >
                                             <div>
-                                                <p className="text-sm font-semibold text-gray-900">{item.title}</p>
-                                                <p className="text-xs text-gray-500">{item.meta}</p>
+                                                <p className="text-sm font-semibold text-gray-900">
+                                                    {item.title}
+                                                </p>
+                                                <p className="text-xs text-gray-500">
+                                                    {item.meta}
+                                                </p>
                                             </div>
-                                            <span className="text-xs text-gray-400">{item.time}</span>
+                                            <span className="text-xs text-gray-400">
+                                                {item.time}
+                                            </span>
                                         </div>
                                     ))}
                                 </div>
