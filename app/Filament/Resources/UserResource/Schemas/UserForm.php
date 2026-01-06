@@ -20,8 +20,18 @@ class UserForm
                         FileUpload::make('avatar_url')
                             ->label('Avatar')
                             ->image()
+->avatar()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                            null,
+                            '16:9',
+                            '4:3',
+                            '1:1',
+                            ])
                             ->directory('avatars')
                             ->disk('public')
+->deletable(true)
+                            ->downloadable(true)
                             ->preserveFilenames()
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
                             ->maxSize(5120)
