@@ -11,6 +11,8 @@ use Illuminate\Validation\ValidationException;
 
 class Login extends AuthLogin
 {
+    protected string $view = 'filament.pages.auth.login';
+
     public function authenticate(): ?LoginResponse
     {
         $data = $this->form->getState();
