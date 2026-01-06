@@ -137,37 +137,57 @@ function CourseCard({ course }) {
     const enrollmentsCount = course.enrollments?.length || 0;
     const publishStatus = course.is_published ? 'Published' : 'Draft';
     const publishColor = course.is_published ? 'bg-green-600/20 text-green-400' : 'bg-slate-600/20 text-slate-400';
+    
+    const thumbnailSrc = course.thumbnail_url
+        ? course.thumbnail_url.startsWith("http") ||
+          course.thumbnail_url.startsWith("/storage/")
+            ? course.thumbnail_url
+            : `/storage/${course.thumbnail_url}`
+        : "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop";
 
     return (
         <div className="group bg-slate-800 border border-slate-700 rounded-lg overflow-hidden hover:border-blue-500 transition-all duration-300">
             <div className="relative h-40 bg-gradient-to-br from-blue-500 to-purple-600">
-                {course.thumbnail_url && (
-                    <img
-                        src={course.thumbnail_url && (course.thumbnail_url.startsWith('http') || course.thumbnail_url.startsWith('/storage/')) ? course.thumbnail_url : `/storage/${course.thumbnail_url}`}
-                        alt={course.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                )}
-                <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${publishColor}`}>
+                <img
+                    src={thumbnailSrc}
+                    alt={course.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+                <div
+                    className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold ${publishColor}`}
+                >
                     {publishStatus}
                 </div>
             </div>
 
             <div className="p-4">
-                <h3 className="font-bold text-white mb-2 line-clamp-2">{course.title}</h3>
+                <h3 className="font-bold text-white mb-2 line-clamp-2">
+                    {course.title}
+                </h3>
 
                 <div className="space-y-2 mb-4 text-sm text-slate-400">
                     <div className="flex justify-between">
                         <span>Students</span>
-                        <span className="text-white font-semibold">{enrollmentsCount}</span>
+                        <span className="text-white font-semibold">
+                            {enrollmentsCount}
+                        </span>
                     </div>
                     <div className="flex justify-between">
                         <span>Price</span>
-                        <span className="text-white font-semibold">${course.price ? parseFloat(course.price).toFixed(2) : '0.00'}</span>
+                        <span className="text-white font-semibold">
+                            $
+                            {course.price
+                                ? parseFloat(course.price).toFixed(2)
+                                : "0.00"}
+                        </span>
                     </div>
                     <div className="flex justify-between">
                         <span>Rating</span>
-                        <span className="text-yellow-400 font-semibold">{course.rating && typeof course.rating === 'number' ? course.rating.toFixed(1) : '—'}</span>
+                        <span className="text-yellow-400 font-semibold">
+                            {course.rating && typeof course.rating === "number"
+                                ? course.rating.toFixed(1)
+                                : "—"}
+                        </span>
                     </div>
                 </div>
 
