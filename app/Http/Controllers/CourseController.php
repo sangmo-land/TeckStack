@@ -97,7 +97,10 @@ unset($validated['thumbnail_url']);
             ->withCount('enrollments');
 
         // Show published courses OR user's own courses (even if unpublished)
-        if (auth()->check()) {
+// Admins can see ALL courses
+        if (auth()->check() && auth()->user()->isAdmin()) {
+        // Admin sees all courses - no filter applied
+        } elseif (auth()->check()) {
             $query->where(function($q) {
                 $q->where('is_published', true)
                   ->orWhere('instructor_id', auth()->id());
