@@ -38,6 +38,42 @@ class CourseController extends Controller
         return redirect()->route('instructor.dashboard')->with('success', 'Course created successfully!');
     }
 
+public function edit(Course $course)
+    {
+    // Ensure user owns this course
+    if ($course->instructor_id !== auth()->id() && auth()->user()->role !== 'admin') {
+    abort(403);
+    }
+    
+    return Inertia::render('Courses/Edit', [
+    'course' => $course,
+    ]);
+    }
+    
+    public function update(Request $request, Course $course)
+    {
+    // Ensure user owns this course
+    if ($course->instructor_id !== auth()->id() && auth()->user()->role !== 'admin') {
+    abort(403);
+    }
+    
+    $validated = $request->validate([
+    'title' => 'required|string|max:255|unique:courses,title,' . $course->id,
+    'description' => 'required|string|max:160',
+    'overview' => 'nullable|string',
+    'category' => 'required|string',
+    'level' => 'required|in:beginner,intermediate,advanced',
+    'price' => 'nullable|numeric|min:0',
+    'language' => 'nullable|string',
+    'learning_outcomes' => 'nullable|array',
+    'requirements' => 'nullable|array',
+    'is_published' => 'boolean',
+    ]);
+    
+    $course->update($validated);
+    
+    return redirect()->route('instructor.dashboard')->with('success', 'Course updated successfully!');
+    }
     public function index(Request $request)
     {
         // Accept instructor filter from either query (?instructor=ID) or route (/courses/instructors=ID)

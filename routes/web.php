@@ -151,6 +151,8 @@ Route::delete('/chapters/{chapter}', [ChapterHierarchyController::class, 'destro
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard/create-course', [CourseController::class, 'create'])->name('courses.create');
     Route::post('/courses', [CourseController::class, 'store'])->name('courses.store');
+Route::get('/dashboard/courses/{course}/edit', [CourseController::class, 'edit'])->name('courses.edit');
+    Route::patch('/dashboard/courses/{course}', [CourseController::class, 'update'])->name('courses.update');
 });
 
 Route::post('/chapters/create', [ChapterHierarchyController::class, 'create'])
