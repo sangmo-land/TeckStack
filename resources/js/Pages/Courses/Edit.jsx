@@ -5,7 +5,13 @@ import { BookOpen, Plus, X, AlertCircle } from 'lucide-react';
 
 export default function EditCourse({ course }) {
     const { user } = usePage().props.auth;
-    const [preview, setPreview] = useState(course.thumbnail_url);
+    const initialPreview = course.thumbnail_url 
+        ? (course.thumbnail_url.startsWith('http') || course.thumbnail_url.startsWith('/storage/') 
+            ? course.thumbnail_url 
+            : `/storage/${course.thumbnail_url}`)
+        : null;
+
+    const [preview, setPreview] = useState(initialPreview);
     const [outcomes, setOutcomes] = useState(course.learning_outcomes || ['']);
     const [requirements, setRequirements] = useState(course.requirements || ['']);
 

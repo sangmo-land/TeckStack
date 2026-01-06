@@ -76,9 +76,7 @@ public function edit($id)
         ]);
 if ($request->hasFile('thumbnail_url')) {
 $path = $request->file('thumbnail_url')->store('course-thumbnails', 'public');
-$validated['thumbnail_url'] = '/storage/' . $path;
-} else {
-unset($validated['thumbnail_url']);
+            $validated['thumbnail_url'] = $path;
 }
         
         $course->update($validated);
