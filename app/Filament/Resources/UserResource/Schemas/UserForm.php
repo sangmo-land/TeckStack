@@ -47,6 +47,7 @@ class UserForm
                             ->maxLength(255),
                         TextInput::make('password')
                             ->password()
+->revealable()
                             ->label('Password')
                             ->required(fn ($record) => $record === null)
                             ->dehydrated(fn ($state) => filled($state))
