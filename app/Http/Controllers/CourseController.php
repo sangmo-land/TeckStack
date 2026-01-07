@@ -152,7 +152,12 @@ $path = $request->file('thumbnail_url')->store('course-thumbnails', 'public');
 
     public function show(Course $course)
     {
-        if (!$course->is_published && (!auth()->check() || auth()->user()->id !== $course->instructor_id)) {
+$canViewUnpublished = auth()->check() && (
+        auth()->user()->id === $course->instructor_id ||
+        auth()->user()->isAdmin()
+        );
+        
+        if (!$course->is_published && !$canViewUnpublished) {
             abort(404);
         }
 
@@ -184,7 +189,12 @@ $path = $request->file('thumbnail_url')->store('course-thumbnails', 'public');
 
     public function content(Course $course)
     {
-        if (!$course->is_published && (!auth()->check() || auth()->user()->id !== $course->instructor_id)) {
+$canViewUnpublished = auth()->check() && (
+        auth()->user()->id === $course->instructor_id ||
+        auth()->user()->isAdmin()
+        );
+        
+        if (!$course->is_published && !$canViewUnpublished) {
             abort(404);
         }
 
