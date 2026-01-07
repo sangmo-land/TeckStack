@@ -19,8 +19,7 @@ class UserForm
                     ->schema([
                         FileUpload::make('avatar_url')
                             ->label('Avatar')
-                            ->image()
-->avatar()
+->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                             null,
