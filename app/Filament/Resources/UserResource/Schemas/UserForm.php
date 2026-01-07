@@ -29,6 +29,7 @@ class UserForm
                             ])
                             ->directory('avatars')
                             ->disk('public')
+                            ->visibility('public')
 ->deletable(true)
                             ->downloadable(true)
                             ->preserveFilenames()
