@@ -290,16 +290,6 @@ function ChapterItem({
                         onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            onOpenChapter?.(chapter.id, "modal");
-                        }}
-                        className="px-3 py-1 text-xs bg-slate-700/50 text-white rounded-md hover:bg-slate-700"
-                    >
-                        Open
-                    </button>
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
                             onOpenChapter?.(chapter.id, "window");
                         }}
                         className="p-2 text-slate-300 hover:text-white rounded-md hover:bg-slate-700/60"
@@ -378,7 +368,7 @@ export default function CourseShow({
 
     const selectedChapter = useMemo(
         () => flatChapters.find((c) => c.id === selectedChapterId) || null,
-        [flatChapters, selectedChapterId]
+        [flatChapters, selectedChapterId],
     );
 
     const currentChapterIndex = selectedChapter
@@ -396,16 +386,9 @@ export default function CourseShow({
         const target = flatChapters.find((c) => c.id === chapterId);
         if (!target) return;
 
-        if (mode === "window") {
-            const url = new URL(window.location.href);
-            url.searchParams.set("chapter", chapterId);
-            url.searchParams.set("view", "content");
-            window.open(url.toString(), "_blank", "noopener");
-            return;
-        }
-
-        setSelectedChapterId(chapterId);
-        setIsContentModalOpen(true);
+        // Always open in new window/tab pointing to the content page
+        const contentUrl = `/courses/${course.slug}/content?chapter=${chapterId}`;
+        window.open(contentUrl, "_blank");
     };
 
     useEffect(() => {
@@ -416,7 +399,7 @@ export default function CourseShow({
         const numericId = Number(chapterIdParam);
         const target = flatChapters.find(
             (c) =>
-                c.id === (Number.isNaN(numericId) ? chapterIdParam : numericId)
+                c.id === (Number.isNaN(numericId) ? chapterIdParam : numericId),
         );
         if (target) {
             setSelectedChapterId(target.id);
@@ -441,7 +424,7 @@ export default function CourseShow({
                 onError: (errors) => {
                     console.error("Error enrolling:", errors);
                 },
-            }
+            },
         );
     };
 
@@ -462,7 +445,7 @@ export default function CourseShow({
                 onError: (errors) => {
                     console.error("Error toggling wishlist:", errors);
                 },
-            }
+            },
         );
     };
 
@@ -483,7 +466,7 @@ export default function CourseShow({
                 onError: (errors) => {
                     console.error("Error submitting review:", errors);
                 },
-            }
+            },
         );
     };
 
@@ -551,7 +534,7 @@ export default function CourseShow({
                                       course.cover_image &&
                                       (course.cover_image.startsWith("http") ||
                                           course.cover_image.startsWith(
-                                              "/storage/"
+                                              "/storage/",
                                           ))
                                           ? course.cover_image
                                           : `/storage/${course.cover_image}`
@@ -620,8 +603,8 @@ export default function CourseShow({
                                                     i <
                                                     Math.floor(
                                                         parseFloat(
-                                                            course.rating
-                                                        ) || 0
+                                                            course.rating,
+                                                        ) || 0,
                                                     )
                                                         ? "fill-yellow-400 text-yellow-400"
                                                         : "fill-slate-600 text-slate-600"
@@ -631,7 +614,7 @@ export default function CourseShow({
                                     </div>
                                     <span className="font-semibold">
                                         {parseFloat(course.rating || 0).toFixed(
-                                            1
+                                            1,
                                         )}
                                     </span>
                                     <span className="text-slate-300">
@@ -739,7 +722,7 @@ export default function CourseShow({
                                                         {outcome}
                                                     </span>
                                                 </div>
-                                            )
+                                            ),
                                         )}
                                     </div>
                                 </section>
@@ -772,7 +755,7 @@ export default function CourseShow({
                                                         </span>
                                                         <span>{req}</span>
                                                     </li>
-                                                )
+                                                ),
                                             )}
                                         </ul>
                                     </section>
@@ -796,7 +779,7 @@ export default function CourseShow({
                                         <button
                                             onClick={() =>
                                                 setShowCodeSnippets(
-                                                    !showCodeSnippets
+                                                    !showCodeSnippets,
                                                 )
                                             }
                                             className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
@@ -827,7 +810,7 @@ export default function CourseShow({
                                                     showCodeSnippets
                                                 }
                                             />
-                                        )
+                                        ),
                                     )}
                                 </div>
                             </section>
@@ -870,7 +853,7 @@ export default function CourseShow({
                                                         .charAt(0)
                                                         .toUpperCase() +
                                                         course.instructor.role.slice(
-                                                            1
+                                                            1,
                                                         )}
                                                 </span>
                                             )}
@@ -891,7 +874,8 @@ export default function CourseShow({
                                                     />
                                                     Member since{" "}
                                                     {new Date(
-                                                        course.instructor.created_at
+                                                        course.instructor
+                                                            .created_at,
                                                     ).getFullYear()}
                                                 </span>
                                             )}
@@ -908,7 +892,7 @@ export default function CourseShow({
                                                             >
                                                                 {exp}
                                                             </span>
-                                                        )
+                                                        ),
                                                     )}
                                                 </div>
                                                 <div className="flex items-center gap-2 mb-2">
@@ -968,9 +952,9 @@ export default function CourseShow({
                                                                     .average_rating ||
                                                                     parseFloat(
                                                                         course.rating ||
-                                                                            0
+                                                                            0,
                                                                     ).toFixed(
-                                                                        1
+                                                                        1,
                                                                     )}
                                                             </p>
                                                         </div>
@@ -1072,7 +1056,7 @@ export default function CourseShow({
                                                             <p className="text-2xl font-bold text-white">
                                                                 {parseFloat(
                                                                     course.rating ||
-                                                                        0
+                                                                        0,
                                                                 ).toFixed(1)}
                                                             </p>
                                                         </div>
@@ -1145,7 +1129,7 @@ export default function CourseShow({
                                                         }
                                                         onMouseEnter={() =>
                                                             setHoveredRating(
-                                                                star
+                                                                star,
                                                             )
                                                         }
                                                         onMouseLeave={() =>
@@ -1217,7 +1201,7 @@ export default function CourseShow({
                                                     <div className="flex items-center gap-3">
                                                         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold">
                                                             {review.user.name.charAt(
-                                                                0
+                                                                0,
                                                             )}
                                                         </div>
                                                         <div>
@@ -1245,7 +1229,7 @@ export default function CourseShow({
                                                                             : "text-slate-700"
                                                                     }
                                                                 />
-                                                            )
+                                                            ),
                                                         )}
                                                     </div>
                                                 </div>
@@ -1254,14 +1238,14 @@ export default function CourseShow({
                                                 </p>
                                                 <p className="text-xs text-slate-500 mt-3">
                                                     {new Date(
-                                                        review.created_at
+                                                        review.created_at,
                                                     ).toLocaleDateString(
                                                         "en-US",
                                                         {
                                                             year: "numeric",
                                                             month: "long",
                                                             day: "numeric",
-                                                        }
+                                                        },
                                                     )}
                                                 </p>
                                             </div>
@@ -1292,14 +1276,14 @@ export default function CourseShow({
                                             <span className="text-5xl font-extrabold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
                                                 $
                                                 {parseFloat(
-                                                    course.price
+                                                    course.price,
                                                 ).toFixed(2)}
                                             </span>
                                             {course.original_price && (
                                                 <span className="text-xl text-slate-500 line-through">
                                                     $
                                                     {parseFloat(
-                                                        course.original_price
+                                                        course.original_price,
                                                     ).toFixed(2)}
                                                 </span>
                                             )}
@@ -1492,7 +1476,7 @@ export default function CourseShow({
                                     onClick={() =>
                                         openChapter(
                                             selectedChapter.id,
-                                            "window"
+                                            "window",
                                         )
                                     }
                                     className="inline-flex items-center gap-1 px-3 py-1 text-sm text-blue-300 bg-blue-500/10 border border-blue-400/30 rounded-md hover:bg-blue-500/20"
@@ -1567,7 +1551,7 @@ export default function CourseShow({
                                                     key={snippet.id}
                                                     snippet={snippet}
                                                 />
-                                            )
+                                            ),
                                         )}
                                     </div>
                                 </div>

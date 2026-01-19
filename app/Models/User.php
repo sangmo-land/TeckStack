@@ -28,6 +28,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         'role',
         'avatar_url',
         'is_email_verified',
+'is_active',
     ];
 
     /**
@@ -51,6 +52,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_email_verified' => 'boolean',
+'is_active' => 'boolean',
         ];
     }
 

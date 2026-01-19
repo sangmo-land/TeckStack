@@ -30,7 +30,7 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -56,8 +56,9 @@ class RegisteredUserController extends Controller
             $admin->notify(new NewUserRegistered($user));
         }
 
-        Auth::login($user);
+// Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+return redirect()->route('login')->with('status', 'Registration successful! Your account is pending approval by an
+        administrator.');
     }
 }

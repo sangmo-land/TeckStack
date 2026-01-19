@@ -197,72 +197,77 @@ export default function Welcome({ auth, testimonials = [], learnerCount = 0 }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {trending.length ? (
                             trending.map((course) => (
-                                <div
+                                <Link
                                     key={course.id || course.slug}
-                                    className="group bg-slate-800/60 border border-slate-700 rounded-xl overflow-hidden hover:border-blue-500 transition-all duration-300"
+                                    href={`/courses/${course.slug}`}
+                                    className="block h-full"
                                 >
-                                    <div className="relative h-40 bg-gradient-to-br from-blue-500 to-purple-600">
-                                        {course.thumbnail_url && (
-                                            <img
-                                                src={
-                                                    course.thumbnail_url?.startsWith(
-                                                        "http"
-                                                    ) ||
-                                                    course.thumbnail_url?.startsWith(
-                                                        "/storage/"
-                                                    )
-                                                        ? course.thumbnail_url
-                                                        : `/storage/${course.thumbnail_url}`
-                                                }
-                                                alt={course.title}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                            />
-                                        )}
-                                        <div className="absolute top-3 right-3 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                                            {course.level || "All"}
+                                    <div className="group bg-slate-800/60 border border-slate-700 rounded-xl overflow-hidden hover:border-blue-500 transition-all duration-300 h-full flex flex-col">
+                                        <div className="relative h-40 bg-gradient-to-br from-blue-500 to-purple-600">
+                                            {course.thumbnail_url && (
+                                                <img
+                                                    src={
+                                                        course.thumbnail_url?.startsWith(
+                                                            "http",
+                                                        ) ||
+                                                        course.thumbnail_url?.startsWith(
+                                                            "/storage/",
+                                                        )
+                                                            ? course.thumbnail_url
+                                                            : `/storage/${course.thumbnail_url}`
+                                                    }
+                                                    alt={course.title}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                                />
+                                            )}
+                                            <div className="absolute top-3 right-3 bg-blue-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                                                {course.level || "All"}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div className="p-6">
-                                        <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
-                                            {course.title}
-                                        </h3>
-                                        <p className="text-sm text-slate-400 mb-4 line-clamp-2">
-                                            {course.description}
-                                        </p>
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-1">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star
-                                                        key={i}
-                                                        size={16}
-                                                        className={
-                                                            i <
-                                                            Math.floor(
-                                                                course.rating ||
-                                                                    0
-                                                            )
-                                                                ? "fill-yellow-400 text-yellow-400"
-                                                                : "text-slate-600"
-                                                        }
-                                                    />
-                                                ))}
-                                                <span className="text-xs text-slate-400 ml-1">
-                                                    (
+                                        <div className="p-6 flex-1 flex flex-col">
+                                            <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
+                                                {course.title}
+                                            </h3>
+                                            <p className="text-sm text-slate-400 mb-4 line-clamp-2 flex-grow">
+                                                {course.description}
+                                            </p>
+                                            <div className="flex items-center justify-between mt-auto">
+                                                <div className="flex items-center gap-1">
+                                                    {[...Array(5)].map(
+                                                        (_, i) => (
+                                                            <Star
+                                                                key={i}
+                                                                size={16}
+                                                                className={
+                                                                    i <
+                                                                    Math.floor(
+                                                                        course.rating ||
+                                                                            0,
+                                                                    )
+                                                                        ? "fill-yellow-400 text-yellow-400"
+                                                                        : "text-slate-600"
+                                                                }
+                                                            />
+                                                        ),
+                                                    )}
+                                                    <span className="text-xs text-slate-400 ml-1">
+                                                        (
+                                                        {Number(
+                                                            course.rating || 0,
+                                                        ).toFixed(1)}
+                                                        )
+                                                    </span>
+                                                </div>
+                                                <span className="text-lg font-bold text-white">
+                                                    $
                                                     {Number(
-                                                        course.rating || 0
-                                                    ).toFixed(1)}
-                                                    )
+                                                        course.price || 0,
+                                                    ).toFixed(2)}
                                                 </span>
                                             </div>
-                                            <span className="text-lg font-bold text-white">
-                                                $
-                                                {Number(
-                                                    course.price || 0
-                                                ).toFixed(2)}
-                                            </span>
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))
                         ) : (
                             <div className="text-slate-400">

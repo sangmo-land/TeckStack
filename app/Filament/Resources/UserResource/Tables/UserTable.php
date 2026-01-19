@@ -40,6 +40,11 @@ class UserTable
                 IconColumn::make('is_email_verified')
                     ->label('Verified')
                     ->boolean(),
+IconColumn::make('is_active')
+                ->label('Approved')
+                ->boolean()
+                ->sortable()
+                ->action(fn ($record) => $record->update(['is_active' => !$record->is_active])), // Toggle action
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

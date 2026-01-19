@@ -63,6 +63,9 @@ class UserForm
                         Toggle::make('is_email_verified')
                             ->label('Email Verified')
                             ->default(false),
+Toggle::make('is_active')
+                        ->label('Account Approved')
+                        ->default(false),
                     ])
                     ->columns(2),
             ]);
