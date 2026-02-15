@@ -694,7 +694,7 @@ export default function CourseShow({
                             </section>
 
                             {/* What You'll Learn - Enhanced Grid */}
-                            {course.learning_outcomes && (
+                            {Array.isArray(course.learning_outcomes) && course.learning_outcomes.length > 0 && (
                                 <section className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
                                     <div className="flex items-center gap-3 mb-8">
                                         <div className="p-3 bg-green-500/10 rounded-lg">
@@ -729,7 +729,7 @@ export default function CourseShow({
                             )}
 
                             {/* Requirements Section */}
-                            {course.requirements &&
+                            {Array.isArray(course.requirements) &&
                                 course.requirements.length > 0 && (
                                     <section className="bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8 shadow-2xl">
                                         <div className="flex items-center gap-3 mb-6">
