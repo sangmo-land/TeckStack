@@ -88,33 +88,47 @@ function buildContours({
         { freq: 8, amp: budget * 0.10, phase: rand() * Math.PI * 2 },
     ];
 
-    return Array.from({ length: rings }, (_, i) => {
-        const radius = innerRadius + i * spacing;
-        // A whisper of per-ring phase drift keeps the bands from looking machined.
-        const drift = i * 0.06;
+    // Shared sampler so rings and the nodes sitting on them agree exactly.
+    const pointOn = (ringIndex, theta) => {
+        const radius = innerRadius + ringIndex * spacing;
+        const drift = ringIndex * 0.06; // whisper of phase drift, so bands aren't machined
+        let displacement = 0;
+        for (const h of harmonics) {
+            displacement += h.amp * Math.sin(h.freq * theta + h.phase + drift);
+        }
+        const r = radius + displacement;
+        return {
+            x: cx + r * Math.cos(theta),
+            y: cy + r * Math.sin(theta) * 0.72, // flatten: terrain, not a bullseye
+        };
+    };
 
+    const paths = Array.from({ length: rings }, (_, i) => {
         let d = '';
         for (let s = 0; s < segments; s++) {
-            const theta = (s / segments) * Math.PI * 2;
-            let displacement = 0;
-            for (const h of harmonics) {
-                displacement += h.amp * Math.sin(h.freq * theta + h.phase + drift);
-            }
-            const r = radius + displacement;
-            const x = cx + r * Math.cos(theta);
-            const y = cy + r * Math.sin(theta) * 0.72; // flatten: reads as terrain, not bullseye
+            const { x, y } = pointOn(i, (s / segments) * Math.PI * 2);
             d += `${s === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
         }
         return { d: `${d}Z`, index: i };
     });
+
+    // Survey markers: a few monitored points sitting exactly on an isoline,
+    // the way a topology map pins hosts to a network.
+    const nodes = [0.34, 0.58, 0.8].map((depth, n) => {
+        const ringIndex = Math.round(depth * (rings - 1));
+        const theta = rand() * Math.PI * 2;
+        return { ...pointOn(ringIndex, theta), index: n };
+    });
+
+    return { paths, nodes };
 }
 
 /**
  * Contour field for hero sections. Replaces the graph-paper grid.
  */
-export function ContourBackdrop({ className = '', seed = 7, accentEvery = 6 }) {
-    const contours = React.useMemo(() => buildContours({ seed }), [seed]);
-    const total = contours.length;
+export function ContourBackdrop({ className = '', seed = 7, accentEvery = 6, animated = true }) {
+    const { paths, nodes } = React.useMemo(() => buildContours({ seed }), [seed]);
+    const total = paths.length;
 
     return (
         <div aria-hidden="true" className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
@@ -133,7 +147,11 @@ export function ContourBackdrop({ className = '', seed = 7, accentEvery = 6 }) {
                         'radial-gradient(ellipse 78% 82% at 50% 45%, #000 50%, transparent 100%)',
                 }}
             >
-                {contours.map(({ d, index }) => {
+                {/* ---------- Layer 1: the terrain, plotted in on load ----------
+                    Every path declares pathLength="1", so dash values are
+                    normalised and no DOM measuring is ever required. Rings draw
+                    from the summit outward, like a survey being rendered. */}
+                {paths.map(({ d, index }) => {
                     // Elevation ramp: brightest at the peak, dissolving outward.
                     const t = index / (total - 1);
                     const fade = Math.pow(1 - t, 1.35);
@@ -143,13 +161,71 @@ export function ContourBackdrop({ className = '', seed = 7, accentEvery = 6 }) {
                         <path
                             key={index}
                             d={d}
+                            pathLength="1"
                             stroke={accent ? 'rgb(34,211,238)' : 'rgb(148,163,184)'}
                             strokeWidth={accent ? 1.15 : 0.85}
                             opacity={(accent ? 0.30 : 0.26) * (0.34 + fade * 0.66)}
                             vectorEffect="non-scaling-stroke"
+                            className={animated ? 'contour-draw' : undefined}
+                            style={animated ? { animationDelay: `${index * 55}ms` } : undefined}
                         />
                     );
                 })}
+
+                {/* ---------- Layer 2: telemetry moving along the isolines ----------
+                    A short arc glides around each accent ring. Reads as data
+                    traversing a topology; only ~4 of 24 rings carry it, and the
+                    periods are coprime-ish so they never fall into lockstep. */}
+                {animated &&
+                    paths
+                        .filter(({ index }) => index % accentEvery === 0 && index > 0)
+                        .map(({ d, index }, n) => (
+                            <path
+                                key={`flow-${index}`}
+                                d={d}
+                                pathLength="1"
+                                stroke="rgb(103,232,249)"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                opacity={0.42 - n * 0.07}
+                                vectorEffect="non-scaling-stroke"
+                                className="contour-flow"
+                                style={{
+                                    strokeDasharray: '0.05 0.95',
+                                    animationDuration: `${23 + n * 9}s`,
+                                    animationDelay: `${-n * 6}s`,
+                                    animationDirection: n % 2 ? 'reverse' : 'normal',
+                                }}
+                            />
+                        ))}
+
+                {/* ---------- Layer 3: survey markers ----------
+                    Monitored points pinned to an isoline, each breathing on its
+                    own slow cycle. Three is enough to imply a system. */}
+                {animated &&
+                    nodes.map(({ x, y, index }) => (
+                        <g key={`node-${index}`}>
+                            <circle
+                                cx={x}
+                                cy={y}
+                                r="10"
+                                fill="none"
+                                stroke="rgb(34,211,238)"
+                                strokeWidth="0.7"
+                                vectorEffect="non-scaling-stroke"
+                                className="contour-ping"
+                                style={{ animationDelay: `${index * 2.7}s` }}
+                            />
+                            <circle
+                                cx={x}
+                                cy={y}
+                                r="2.2"
+                                fill="rgb(103,232,249)"
+                                className="contour-node-dot"
+                                style={{ animationDelay: `${index * 1.6}s` }}
+                            />
+                        </g>
+                    ))}
             </svg>
         </div>
     );

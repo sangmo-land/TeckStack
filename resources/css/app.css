@@ -286,6 +286,87 @@
         opacity: 1;
     }
 
+    /* --- Contour field animation ------------------------------------
+       Three layers of instrumentation, deliberately slow. Every path
+       carries pathLength="1", so dash values are normalised and none of
+       this needs to measure the DOM.
+       ----------------------------------------------------------------- */
+
+    /* 1. Plotter draw-in — the survey renders itself, once, on load. */
+    @keyframes contour-draw {
+        from {
+            stroke-dashoffset: 1;
+        }
+        to {
+            stroke-dashoffset: 0;
+        }
+    }
+    .contour-draw {
+        stroke-dasharray: 1;
+        animation: contour-draw 2.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    /* 2. Telemetry — a short arc travels the isoline, like a packet on a route. */
+    @keyframes contour-flow {
+        from {
+            stroke-dashoffset: 0;
+        }
+        to {
+            stroke-dashoffset: -1;
+        }
+    }
+    .contour-flow {
+        animation-name: contour-flow;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+    }
+
+    /* 3. Survey markers — a monitored point and its outward ping. */
+    @keyframes contour-ping {
+        0% {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+        16% {
+            opacity: 0.4;
+        }
+        100% {
+            transform: scale(1.85);
+            opacity: 0;
+        }
+    }
+    .contour-ping {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: contour-ping 7s cubic-bezier(0.24, 0.8, 0.36, 1) infinite;
+    }
+
+    @keyframes contour-node-breathe {
+        0%,
+        100% {
+            opacity: 0.28;
+        }
+        50% {
+            opacity: 0.7;
+        }
+    }
+    .contour-node-dot {
+        animation: contour-node-breathe 4.8s ease-in-out infinite;
+    }
+
+    /* The global reduced-motion rule collapses durations to ~0, which would
+       leave the ping frozen at its final (invisible) keyframe. Pin the markers
+       to a legible static state instead of letting them vanish. */
+    @media (prefers-reduced-motion: reduce) {
+        .contour-ping {
+            opacity: 0.26;
+            transform: none;
+        }
+        .contour-node-dot {
+            opacity: 0.55;
+        }
+    }
+
     /* --- Skeleton --------------------------------------------------- */
     .skeleton {
         @apply rounded-lg bg-void-300;
