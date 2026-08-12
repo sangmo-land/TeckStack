@@ -88,19 +88,47 @@ function buildContours({
         { freq: 8, amp: budget * 0.10, phase: rand() * Math.PI * 2 },
     ];
 
-    // Shared sampler so rings and the nodes sitting on them agree exactly.
+    /* ------------------------------------------------------------------
+       The terrain is a closed-form scalar field, which is what lets the
+       flow lines below be *derived* rather than drawn by hand:
+
+           h(ρ,θ) = C − ρ + D(θ,ρ)          (elevation; peak at the centre)
+           D(θ,ρ) = Σ aₖ·sin(kθ + φₖ + cρ)  (the harmonic displacement)
+
+       Contours are the level sets of h. Flow lines are the integral curves
+       of −∇h. The phase drift is a function of ρ rather than of ring index
+       so both the rings and the gradient read the same field.
+       ------------------------------------------------------------------ */
+    const DRIFT_K = 0.06 / spacing;
+
+    const displacementAt = (theta, rho) => {
+        const drift = DRIFT_K * (rho - innerRadius);
+        let s = 0;
+        for (const h of harmonics) s += h.amp * Math.sin(h.freq * theta + h.phase + drift);
+        return s;
+    };
+    const dD_dTheta = (theta, rho) => {
+        const drift = DRIFT_K * (rho - innerRadius);
+        let s = 0;
+        for (const h of harmonics) s += h.amp * h.freq * Math.cos(h.freq * theta + h.phase + drift);
+        return s;
+    };
+    const dD_dRho = (theta, rho) => {
+        const drift = DRIFT_K * (rho - innerRadius);
+        let s = 0;
+        for (const h of harmonics) s += h.amp * DRIFT_K * Math.cos(h.freq * theta + h.phase + drift);
+        return s;
+    };
+
+    // Flatten vertically so the field reads as terrain seen at an angle.
+    const toScreen = (rho, theta) => ({
+        x: cx + rho * Math.cos(theta),
+        y: cy + rho * Math.sin(theta) * 0.72,
+    });
+
     const pointOn = (ringIndex, theta) => {
-        const radius = innerRadius + ringIndex * spacing;
-        const drift = ringIndex * 0.06; // whisper of phase drift, so bands aren't machined
-        let displacement = 0;
-        for (const h of harmonics) {
-            displacement += h.amp * Math.sin(h.freq * theta + h.phase + drift);
-        }
-        const r = radius + displacement;
-        return {
-            x: cx + r * Math.cos(theta),
-            y: cy + r * Math.sin(theta) * 0.72, // flatten: terrain, not a bullseye
-        };
+        const base = innerRadius + ringIndex * spacing;
+        return toScreen(base + displacementAt(theta, base), theta);
     };
 
     const paths = Array.from({ length: rings }, (_, i) => {
@@ -112,22 +140,48 @@ function buildContours({
         return { d: `${d}Z`, index: i };
     });
 
-    // Survey markers: a few monitored points sitting exactly on an isoline,
-    // the way a topology map pins hosts to a network.
-    const nodes = [0.34, 0.58, 0.8].map((depth, n) => {
-        const ringIndex = Math.round(depth * (rings - 1));
-        const theta = rand() * Math.PI * 2;
-        return { ...pointOn(ringIndex, theta), index: n };
+    /* Integral curves of steepest descent. Each one starts near the summit
+       and is integrated outward, bending as the gradient turns — which is
+       exactly why they always cross the contours at right angles. */
+    const streamline = (theta0) => {
+        let rho = innerRadius + spacing * 1.1;
+        let theta = theta0;
+        let d = '';
+
+        for (let step = 0; step < 320 && rho < outerRadius * 1.04; step++) {
+            // ∇h in the orthonormal (ρ̂, θ̂) basis, then descend against it.
+            const gRho = -1 + dD_dRho(theta, rho);
+            const gTheta = dD_dTheta(theta, rho) / rho;
+
+            let dRho = -gRho;
+            let dTheta = -gTheta;
+            const mag = Math.hypot(dRho, dTheta) || 1;
+            dRho /= mag;
+            dTheta /= mag;
+
+            const stepLen = 7;
+            rho += dRho * stepLen;
+            theta += (dTheta * stepLen) / rho; // arc length along θ̂ → angle
+
+            const { x, y } = toScreen(rho, theta);
+            d += `${step === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+        }
+        return d;
+    };
+
+    const flowLines = Array.from({ length: 7 }, (_, i) => {
+        const theta0 = (i / 7) * Math.PI * 2 + rand() * 0.5;
+        return { d: streamline(theta0), index: i };
     });
 
-    return { paths, nodes };
+    return { paths, flowLines };
 }
 
 /**
  * Contour field for hero sections. Replaces the graph-paper grid.
  */
 export function ContourBackdrop({ className = '', seed = 7, accentEvery = 6, animated = true }) {
-    const { paths, nodes } = React.useMemo(() => buildContours({ seed }), [seed]);
+    const { paths, flowLines } = React.useMemo(() => buildContours({ seed }), [seed]);
     const total = paths.length;
 
     return (
@@ -172,60 +226,67 @@ export function ContourBackdrop({ className = '', seed = 7, accentEvery = 6, ani
                     );
                 })}
 
-                {/* ---------- Layer 2: telemetry moving along the isolines ----------
-                    A short arc glides around each accent ring. Reads as data
-                    traversing a topology; only ~4 of 24 rings carry it, and the
-                    periods are coprime-ish so they never fall into lockstep. */}
+                {/* ---------- Layer 2: propagation wave ----------
+                    A brightness front sweeps outward, ring after ring — the
+                    same direction the gradient points. Reads as a write
+                    replicating through tiers, or a query fanning out from
+                    its origin. Every 2nd ring carries it; that is enough to
+                    see a front without lighting up the whole field. */}
                 {animated &&
                     paths
-                        .filter(({ index }) => index % accentEvery === 0 && index > 0)
-                        .map(({ d, index }, n) => (
+                        .filter(({ index }) => index % 2 === 0)
+                        .map(({ d, index }) => {
+                            // The wrapper carries the same elevation falloff as the
+                            // terrain; nested opacity multiplies, so the front dims
+                            // as it travels out instead of blooming at the edges.
+                            const fade = Math.pow(1 - index / (total - 1), 1.35);
+                            return (
+                                <g key={`wave-${index}`} opacity={0.3 + fade * 0.7}>
+                                    <path
+                                        d={d}
+                                        stroke="rgb(103,232,249)"
+                                        strokeWidth="1.1"
+                                        vectorEffect="non-scaling-stroke"
+                                        className="contour-wave"
+                                        style={{ animationDelay: `${index * 0.17}s` }}
+                                    />
+                                </g>
+                            );
+                        })}
+
+                {/* ---------- Layer 3: gradient flow lines ----------
+                    Integral curves of −∇h: the path water takes down this
+                    terrain, and the direction a signal travels away from its
+                    source. They meet every contour at a right angle because
+                    the geometry says so, not because they were drawn that way. */}
+                {flowLines.map(({ d, index }) => (
+                    <g key={`stream-${index}`}>
+                        <path
+                            d={d}
+                            stroke="rgb(148,163,184)"
+                            strokeWidth="0.6"
+                            opacity="0.10"
+                            vectorEffect="non-scaling-stroke"
+                        />
+                        {animated && (
                             <path
-                                key={`flow-${index}`}
                                 d={d}
                                 pathLength="1"
                                 stroke="rgb(103,232,249)"
-                                strokeWidth="1.5"
+                                strokeWidth="1.6"
                                 strokeLinecap="round"
-                                opacity={0.42 - n * 0.07}
+                                opacity="0.5"
                                 vectorEffect="non-scaling-stroke"
-                                className="contour-flow"
+                                className="contour-descend"
                                 style={{
-                                    strokeDasharray: '0.05 0.95',
-                                    animationDuration: `${23 + n * 9}s`,
-                                    animationDelay: `${-n * 6}s`,
-                                    animationDirection: n % 2 ? 'reverse' : 'normal',
+                                    strokeDasharray: '0.07 0.93',
+                                    animationDuration: `${9 + index * 1.6}s`,
+                                    animationDelay: `${-index * 2.3}s`,
                                 }}
                             />
-                        ))}
-
-                {/* ---------- Layer 3: survey markers ----------
-                    Monitored points pinned to an isoline, each breathing on its
-                    own slow cycle. Three is enough to imply a system. */}
-                {animated &&
-                    nodes.map(({ x, y, index }) => (
-                        <g key={`node-${index}`}>
-                            <circle
-                                cx={x}
-                                cy={y}
-                                r="10"
-                                fill="none"
-                                stroke="rgb(34,211,238)"
-                                strokeWidth="0.7"
-                                vectorEffect="non-scaling-stroke"
-                                className="contour-ping"
-                                style={{ animationDelay: `${index * 2.7}s` }}
-                            />
-                            <circle
-                                cx={x}
-                                cy={y}
-                                r="2.2"
-                                fill="rgb(103,232,249)"
-                                className="contour-node-dot"
-                                style={{ animationDelay: `${index * 1.6}s` }}
-                            />
-                        </g>
-                    ))}
+                        )}
+                    </g>
+                ))}
             </svg>
         </div>
     );
