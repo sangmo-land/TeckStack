@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, Check } from 'lucide-react';
 import Logo from '@/Components/ui/Logo';
-import { Aurora, ContourBackdrop } from '@/Components/ui/Backdrop';
+import { Aurora, IndexBackdrop } from '@/Components/ui/Backdrop';
 
 /**
  * Split auth shell: a brand/value panel on the left (desktop only) and the
@@ -12,7 +12,7 @@ export default function AuthLayout({ title, subtitle, children, aside, footer })
     return (
         <div className="texture-grain relative min-h-screen bg-void">
             <Aurora />
-            <ContourBackdrop seed={137} />
+            <IndexBackdrop seed={137} />
 
             <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col px-5 sm:px-8">
                 {/* Top bar */}

@@ -1,0 +1,1 @@
+import{j as s}from"./app-CBfP3bWF.js";function a({className:o="",disabled:t,children:r,...n}){return s.jsx("button",{...n,className:`btn-flux ${t?"opacity-50":""} `+o,disabled:t,children:r})}export{a as P};

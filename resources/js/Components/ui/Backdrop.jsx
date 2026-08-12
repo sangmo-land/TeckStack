@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Layered page background: aurora light sources over an engineering grid,
+ * Layered page background: aurora light sources over structural geometry,
  * both masked so they never meet a hard edge. Sits at z-0 behind content.
  */
 export function Aurora({ className = '', variant = 'hero' }) {
@@ -46,17 +46,17 @@ export function GridBackdrop({ className = '', size = 'lg' }) {
 }
 
 /* ============================================================
-   TOPOGRAPHIC CONTOURS
-   Nested elevation rings, echoing the stacked-strata logo mark.
+   B-TREE INDEX
+   The structure every relational index actually is: a root of
+   separator keys, internal nodes, and a linked chain of leaves.
 
-   Each ring is a circle displaced by a sum of sine harmonics.
-   Because the displacement is *absolute* rather than proportional
-   to the ring's radius, every ring deforms by the same amount and
-   the contours stay parallel — they can never cross, which is what
-   separates a real contour map from a pile of wobbly circles.
+   The animation is a real operation rather than decoration —
+   an index seek descends root → internal → leaf following the
+   key ranges, then a range scan walks the leaf chain sideways,
+   which is exactly what `WHERE k BETWEEN a AND b` does.
    ============================================================ */
 
-/** Deterministic PRNG (mulberry32) so the terrain is identical on every render. */
+/** Deterministic PRNG (mulberry32) so the index is identical on every render. */
 function mulberry32(seed) {
     return function () {
         seed |= 0;
@@ -67,226 +67,306 @@ function mulberry32(seed) {
     };
 }
 
-function buildContours({
-    seed = 7,
-    rings = 24,
-    innerRadius = 38,
-    outerRadius = 580,
-    cx = 500,
-    cy = 400,
-    segments = 168,
-} = {}) {
-    const rand = mulberry32(seed);
-    const spacing = (outerRadius - innerRadius) / (rings - 1);
+const VB_W = 1240;
+const VB_H = 640;
 
-    // Harmonic budget stays under half the ring spacing, guaranteeing no crossings.
-    const budget = spacing * 0.42;
-    const harmonics = [
-        { freq: 2, amp: budget * 0.44, phase: rand() * Math.PI * 2 },
-        { freq: 3, amp: budget * 0.30, phase: rand() * Math.PI * 2 },
-        { freq: 5, amp: budget * 0.16, phase: rand() * Math.PI * 2 },
-        { freq: 8, amp: budget * 0.10, phase: rand() * Math.PI * 2 },
+function buildIndex({ seed = 7, leafCount = 9, fanout = 3 } = {}) {
+    const rand = mulberry32(seed);
+
+    // --- Geometry -------------------------------------------------
+    const leafW = 98, leafH = 34, leafGap = 20;
+    const internalW = 128, internalH = 38;
+    const rootW = 158, rootH = 40;
+
+    const totalW = leafCount * leafW + (leafCount - 1) * leafGap;
+    const startX = (VB_W - totalW) / 2;
+
+    const yRoot = 120, yInternal = 300, yLeaf = 486;
+
+    // --- Keys: strictly ascending, the way a real index is ordered.
+    let k = 4 + Math.floor(rand() * 8);
+    const leaves = Array.from({ length: leafCount }, (_, i) => {
+        const keys = [];
+        for (let s = 0; s < 2; s++) {
+            k += 3 + Math.floor(rand() * 14);
+            keys.push(k);
+        }
+        return {
+            index: i,
+            x: startX + i * (leafW + leafGap),
+            y: yLeaf,
+            w: leafW,
+            h: leafH,
+            keys,
+        };
+    });
+
+    const internalCount = Math.ceil(leafCount / fanout);
+    const internals = Array.from({ length: internalCount }, (_, j) => {
+        const kids = leaves.slice(j * fanout, j * fanout + fanout);
+        const cx = (kids[0].x + kids[kids.length - 1].x + leafW) / 2;
+        return {
+            index: j,
+            x: cx - internalW / 2,
+            y: yInternal,
+            w: internalW,
+            h: internalH,
+            // Separator keys are the first key of each child but the leftmost.
+            keys: kids.slice(1).map((c) => c.keys[0]),
+            children: kids.map((c) => c.index),
+        };
+    });
+
+    const root = {
+        x: VB_W / 2 - rootW / 2,
+        y: yRoot,
+        w: rootW,
+        h: rootH,
+        keys: internals.slice(1).map((n) => n.keys[0]),
+        children: internals.map((n) => n.index),
+    };
+
+    // --- Edges: parent slot boundary curving down to the child's top.
+    const edge = (px, py, cx2, cy2) =>
+        `M${px.toFixed(1)} ${py.toFixed(1)} C${px.toFixed(1)} ${(py + 56).toFixed(1)} ${cx2.toFixed(1)} ${(cy2 - 56).toFixed(1)} ${cx2.toFixed(1)} ${cy2.toFixed(1)}`;
+
+    const rootEdges = internals.map((n, j) => ({
+        key: `r${j}`,
+        to: j,
+        d: edge(
+            root.x + (root.w / (internals.length + 1)) * (j + 1),
+            root.y + root.h,
+            n.x + n.w / 2,
+            n.y,
+        ),
+    }));
+
+    const internalEdges = [];
+    internals.forEach((n) => {
+        n.children.forEach((leafIdx, c) => {
+            const leaf = leaves[leafIdx];
+            internalEdges.push({
+                key: `i${n.index}-${leafIdx}`,
+                from: n.index,
+                to: leafIdx,
+                d: edge(n.x + (n.w / (n.children.length + 1)) * (c + 1), n.y + n.h, leaf.x + leaf.w / 2, leaf.y),
+            });
+        });
+    });
+
+    // --- Leaf chain: the sibling pointers that make range scans cheap.
+    const chain = leaves.slice(0, -1).map((leaf, i) => ({
+        key: `c${i}`,
+        from: i,
+        to: i + 1,
+        d: `M${(leaf.x + leaf.w).toFixed(1)} ${(leaf.y + leaf.h / 2).toFixed(1)} L${leaves[i + 1].x.toFixed(1)} ${(leaf.y + leaf.h / 2).toFixed(1)}`,
+    }));
+
+    /* --- Seeks -----------------------------------------------------
+       Each seek descends to a target leaf, then range-scans right.
+       Steps are emitted in execution order; the renderer turns the
+       ordinal into an animation-delay so the path lights in sequence. */
+    const SEEK_TARGETS = [
+        { leaf: 1, scan: 3 },
+        { leaf: 7, scan: 1 },
+        { leaf: 4, scan: 2 },
     ];
 
-    /* ------------------------------------------------------------------
-       The terrain is a closed-form scalar field, which is what lets the
-       flow lines below be *derived* rather than drawn by hand:
+    const seeks = SEEK_TARGETS.map((target, s) => {
+        const parent = internals.find((n) => n.children.includes(target.leaf));
+        const steps = [
+            { kind: 'node', node: root },
+            { kind: 'edge', d: rootEdges.find((e) => e.to === parent.index).d },
+            { kind: 'node', node: parent },
+            { kind: 'edge', d: internalEdges.find((e) => e.from === parent.index && e.to === target.leaf).d },
+            { kind: 'node', node: leaves[target.leaf], hit: true },
+        ];
 
-           h(ρ,θ) = C − ρ + D(θ,ρ)          (elevation; peak at the centre)
-           D(θ,ρ) = Σ aₖ·sin(kθ + φₖ + cρ)  (the harmonic displacement)
-
-       Contours are the level sets of h. Flow lines are the integral curves
-       of −∇h. The phase drift is a function of ρ rather than of ring index
-       so both the rings and the gradient read the same field.
-       ------------------------------------------------------------------ */
-    const DRIFT_K = 0.06 / spacing;
-
-    const displacementAt = (theta, rho) => {
-        const drift = DRIFT_K * (rho - innerRadius);
-        let s = 0;
-        for (const h of harmonics) s += h.amp * Math.sin(h.freq * theta + h.phase + drift);
-        return s;
-    };
-    const dD_dTheta = (theta, rho) => {
-        const drift = DRIFT_K * (rho - innerRadius);
-        let s = 0;
-        for (const h of harmonics) s += h.amp * h.freq * Math.cos(h.freq * theta + h.phase + drift);
-        return s;
-    };
-    const dD_dRho = (theta, rho) => {
-        const drift = DRIFT_K * (rho - innerRadius);
-        let s = 0;
-        for (const h of harmonics) s += h.amp * DRIFT_K * Math.cos(h.freq * theta + h.phase + drift);
-        return s;
-    };
-
-    // Flatten vertically so the field reads as terrain seen at an angle.
-    const toScreen = (rho, theta) => ({
-        x: cx + rho * Math.cos(theta),
-        y: cy + rho * Math.sin(theta) * 0.72,
-    });
-
-    const pointOn = (ringIndex, theta) => {
-        const base = innerRadius + ringIndex * spacing;
-        return toScreen(base + displacementAt(theta, base), theta);
-    };
-
-    const paths = Array.from({ length: rings }, (_, i) => {
-        let d = '';
-        for (let s = 0; s < segments; s++) {
-            const { x, y } = pointOn(i, (s / segments) * Math.PI * 2);
-            d += `${s === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+        // Range scan: hop along the leaf chain from the hit leaf rightwards.
+        for (let i = 0; i < target.scan; i++) {
+            const from = target.leaf + i;
+            const to = from + 1;
+            if (to >= leaves.length) break;
+            steps.push({ kind: 'chain', d: chain[from].d });
+            steps.push({ kind: 'node', node: leaves[to], scan: true });
         }
-        return { d: `${d}Z`, index: i };
+
+        return { index: s, steps };
     });
 
-    /* Integral curves of steepest descent. Each one starts near the summit
-       and is integrated outward, bending as the gradient turns — which is
-       exactly why they always cross the contours at right angles. */
-    const streamline = (theta0) => {
-        let rho = innerRadius + spacing * 1.1;
-        let theta = theta0;
-        let d = '';
+    return { root, internals, leaves, rootEdges, internalEdges, chain, seeks };
+}
 
-        for (let step = 0; step < 320 && rho < outerRadius * 1.04; step++) {
-            // ∇h in the orthonormal (ρ̂, θ̂) basis, then descend against it.
-            const gRho = -1 + dD_dRho(theta, rho);
-            const gTheta = dD_dTheta(theta, rho) / rho;
+/** One node box: hairline shell, key slots, faint key values. */
+function IndexNode({ node, tone = 'base', delay = 0, animated = true }) {
+    const slots = node.keys.length + 1;
+    const stroke = tone === 'active' ? 'rgb(103,232,249)' : 'rgb(148,163,184)';
 
-            let dRho = -gRho;
-            let dTheta = -gTheta;
-            const mag = Math.hypot(dRho, dTheta) || 1;
-            dRho /= mag;
-            dTheta /= mag;
-
-            const stepLen = 7;
-            rho += dRho * stepLen;
-            theta += (dTheta * stepLen) / rho; // arc length along θ̂ → angle
-
-            const { x, y } = toScreen(rho, theta);
-            d += `${step === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
-        }
-        return d;
-    };
-
-    const flowLines = Array.from({ length: 7 }, (_, i) => {
-        const theta0 = (i / 7) * Math.PI * 2 + rand() * 0.5;
-        return { d: streamline(theta0), index: i };
-    });
-
-    return { paths, flowLines };
+    return (
+        <g>
+            <rect
+                x={node.x}
+                y={node.y}
+                width={node.w}
+                height={node.h}
+                rx="7"
+                fill={tone === 'active' ? 'rgba(34,211,238,0.10)' : 'rgba(148,163,184,0.03)'}
+                stroke={stroke}
+                strokeWidth={tone === 'active' ? 1.4 : 0.9}
+                vectorEffect="non-scaling-stroke"
+            />
+            {/* Slot dividers — a node holds keys, not one value. */}
+            {Array.from({ length: slots - 1 }, (_, i) => (
+                <line
+                    key={i}
+                    x1={node.x + (node.w / slots) * (i + 1)}
+                    y1={node.y + 6}
+                    x2={node.x + (node.w / slots) * (i + 1)}
+                    y2={node.y + node.h - 6}
+                    stroke={stroke}
+                    strokeWidth="0.7"
+                    opacity="0.5"
+                    vectorEffect="non-scaling-stroke"
+                />
+            ))}
+            {node.keys.map((key, i) => (
+                <text
+                    key={i}
+                    x={node.x + (node.w / slots) * (i + 1)}
+                    y={node.y + node.h / 2 + 3.5}
+                    textAnchor="middle"
+                    fontSize="11"
+                    fontFamily="ui-monospace, monospace"
+                    fill={tone === 'active' ? 'rgb(103,232,249)' : 'rgb(148,163,184)'}
+                    opacity={tone === 'active' ? 0.9 : 0.55}
+                >
+                    {key}
+                </text>
+            ))}
+        </g>
+    );
 }
 
 /**
- * Contour field for hero sections. Replaces the graph-paper grid.
+ * B-tree index backdrop for hero sections.
  */
-export function ContourBackdrop({ className = '', seed = 7, accentEvery = 6, animated = true }) {
-    const { paths, flowLines } = React.useMemo(() => buildContours({ seed }), [seed]);
-    const total = paths.length;
+export function IndexBackdrop({ className = '', seed = 7, animated = true }) {
+    const idx = React.useMemo(() => buildIndex({ seed }), [seed]);
+    const { root, internals, leaves, rootEdges, internalEdges, chain, seeks } = idx;
+
+    // One full pass through all three seeks, then a pause before repeating.
+    const CYCLE = 21;
+    const STEP = 0.42;
+    const SEEK_SLOT = CYCLE / seeks.length;
 
     return (
         <div aria-hidden="true" className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
             <svg
-                className="absolute left-1/2 top-1/2 h-[135%] w-[135%] -translate-x-1/2 -translate-y-1/2 animate-contour-breathe"
-                viewBox="0 0 1000 800"
-                preserveAspectRatio="xMidYMid slice"
+                className="absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2"
+                viewBox={`0 0 ${VB_W} ${VB_H}`}
+                /* `meet` rather than `slice`: the tree is a single readable
+                   object, so cropping its outer leaves would just look broken. */
+                preserveAspectRatio="xMidYMid meet"
                 fill="none"
                 style={{
-                    // Gentler than the shared .mask-radial: the elevation ramp below
-                    // already fades the outer bands, so a hard mask double-dips and
-                    // erases the field entirely.
                     WebkitMaskImage:
-                        'radial-gradient(ellipse 78% 82% at 50% 45%, #000 50%, transparent 100%)',
-                    maskImage:
-                        'radial-gradient(ellipse 78% 82% at 50% 45%, #000 50%, transparent 100%)',
+                        'radial-gradient(ellipse 76% 70% at 50% 44%, #000 30%, transparent 100%)',
+                    maskImage: 'radial-gradient(ellipse 76% 70% at 50% 44%, #000 30%, transparent 100%)',
                 }}
             >
-                {/* ---------- Layer 1: the terrain, plotted in on load ----------
-                    Every path declares pathLength="1", so dash values are
-                    normalised and no DOM measuring is ever required. Rings draw
-                    from the summit outward, like a survey being rendered. */}
-                {paths.map(({ d, index }) => {
-                    // Elevation ramp: brightest at the peak, dissolving outward.
-                    const t = index / (total - 1);
-                    const fade = Math.pow(1 - t, 1.35);
-                    const accent = index % accentEvery === 0;
-
-                    return (
+                {/* ---------- Static structure ----------
+                    Deliberately faint. This is wallpaper behind a headline,
+                    not a diagram the reader is meant to study. */}
+                <g opacity="0.14">
+                    {[...rootEdges, ...internalEdges].map((e, i) => (
                         <path
-                            key={index}
-                            d={d}
+                            key={e.key}
+                            d={e.d}
                             pathLength="1"
-                            stroke={accent ? 'rgb(34,211,238)' : 'rgb(148,163,184)'}
-                            strokeWidth={accent ? 1.15 : 0.85}
-                            opacity={(accent ? 0.30 : 0.26) * (0.34 + fade * 0.66)}
-                            vectorEffect="non-scaling-stroke"
-                            className={animated ? 'contour-draw' : undefined}
-                            style={animated ? { animationDelay: `${index * 55}ms` } : undefined}
-                        />
-                    );
-                })}
-
-                {/* ---------- Layer 2: propagation wave ----------
-                    A brightness front sweeps outward, ring after ring — the
-                    same direction the gradient points. Reads as a write
-                    replicating through tiers, or a query fanning out from
-                    its origin. Every 2nd ring carries it; that is enough to
-                    see a front without lighting up the whole field. */}
-                {animated &&
-                    paths
-                        .filter(({ index }) => index % 2 === 0)
-                        .map(({ d, index }) => {
-                            // The wrapper carries the same elevation falloff as the
-                            // terrain; nested opacity multiplies, so the front dims
-                            // as it travels out instead of blooming at the edges.
-                            const fade = Math.pow(1 - index / (total - 1), 1.35);
-                            return (
-                                <g key={`wave-${index}`} opacity={0.3 + fade * 0.7}>
-                                    <path
-                                        d={d}
-                                        stroke="rgb(103,232,249)"
-                                        strokeWidth="1.1"
-                                        vectorEffect="non-scaling-stroke"
-                                        className="contour-wave"
-                                        style={{ animationDelay: `${index * 0.17}s` }}
-                                    />
-                                </g>
-                            );
-                        })}
-
-                {/* ---------- Layer 3: gradient flow lines ----------
-                    Integral curves of −∇h: the path water takes down this
-                    terrain, and the direction a signal travels away from its
-                    source. They meet every contour at a right angle because
-                    the geometry says so, not because they were drawn that way. */}
-                {flowLines.map(({ d, index }) => (
-                    <g key={`stream-${index}`}>
-                        <path
-                            d={d}
                             stroke="rgb(148,163,184)"
-                            strokeWidth="0.6"
-                            opacity="0.10"
+                            strokeWidth="0.9"
                             vectorEffect="non-scaling-stroke"
+                            className={animated ? 'btree-draw' : undefined}
+                            style={animated ? { animationDelay: `${300 + i * 45}ms` } : undefined}
                         />
-                        {animated && (
-                            <path
-                                d={d}
-                                pathLength="1"
-                                stroke="rgb(103,232,249)"
-                                strokeWidth="1.6"
-                                strokeLinecap="round"
-                                opacity="0.5"
-                                vectorEffect="non-scaling-stroke"
-                                className="contour-descend"
-                                style={{
-                                    strokeDasharray: '0.07 0.93',
-                                    animationDuration: `${9 + index * 1.6}s`,
-                                    animationDelay: `${-index * 2.3}s`,
-                                }}
-                            />
-                        )}
-                    </g>
-                ))}
+                    ))}
+
+                    {/* Leaf sibling pointers — the reason range scans are cheap. */}
+                    {chain.map((c, i) => (
+                        <path
+                            key={c.key}
+                            d={c.d}
+                            pathLength="1"
+                            stroke="rgb(148,163,184)"
+                            strokeWidth="0.8"
+                            strokeDasharray="4 4"
+                            vectorEffect="non-scaling-stroke"
+                            className={animated ? 'btree-draw' : undefined}
+                            style={animated ? { animationDelay: `${900 + i * 40}ms` } : undefined}
+                        />
+                    ))}
+
+                    <IndexNode node={root} />
+                    {internals.map((n) => (
+                        <IndexNode key={`int-${n.index}`} node={n} />
+                    ))}
+                    {leaves.map((n) => (
+                        <IndexNode key={`leaf-${n.index}`} node={n} />
+                    ))}
+                </g>
+
+                {/* ---------- Seek highlights ----------
+                    Each step is a duplicate of the geometry it lights, scheduled
+                    by animation-delay so the path illuminates in execution order:
+                    root → internal → leaf, then sideways along the chain. */}
+                {animated && (
+                  <g opacity="0.5">
+                    {seeks.map((seek) =>
+                        seek.steps.map((step, i) => {
+                            const delay = seek.index * SEEK_SLOT + i * STEP;
+                            const style = {
+                                animationDuration: `${CYCLE}s`,
+                                animationDelay: `${delay}s`,
+                            };
+
+                            if (step.kind === 'node') {
+                                return (
+                                    <g key={`s${seek.index}-${i}`} className="btree-seek" style={style}>
+                                        <IndexNode node={step.node} tone="active" />
+                                        {step.hit && (
+                                            <rect
+                                                x={step.node.x - 5}
+                                                y={step.node.y - 5}
+                                                width={step.node.w + 10}
+                                                height={step.node.h + 10}
+                                                rx="10"
+                                                fill="none"
+                                                stroke="rgb(34,211,238)"
+                                                strokeWidth="0.8"
+                                                opacity="0.45"
+                                                vectorEffect="non-scaling-stroke"
+                                            />
+                                        )}
+                                    </g>
+                                );
+                            }
+
+                            return (
+                                <path
+                                    key={`s${seek.index}-${i}`}
+                                    d={step.d}
+                                    stroke="rgb(103,232,249)"
+                                    strokeWidth={step.kind === 'chain' ? 1.6 : 1.4}
+                                    strokeDasharray={step.kind === 'chain' ? '4 4' : undefined}
+                                    vectorEffect="non-scaling-stroke"
+                                    className="btree-seek"
+                                    style={style}
+                                />
+                            );
+                        }),
+                    )}
+                  </g>
+                )}
             </svg>
         </div>
     );

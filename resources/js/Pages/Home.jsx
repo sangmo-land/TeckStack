@@ -13,7 +13,7 @@ import CountUp from '@/Components/ui/CountUp';
 import Marquee from '@/Components/ui/Marquee';
 import Terminal from '@/Components/ui/Terminal';
 import CourseCard, { CourseCardSkeleton } from '@/Components/ui/CourseCard';
-import { PageShell, Aurora, ContourBackdrop, Section, SectionHeading } from '@/Components/ui/Backdrop';
+import { PageShell, Aurora, IndexBackdrop, Section, SectionHeading } from '@/Components/ui/Backdrop';
 
 // NOTE: placeholder marketing figures — swap for real values before launch.
 const STATS = [
@@ -103,7 +103,7 @@ export default function Home({ auth }) {
                 ========================================================== */}
             <section className="relative overflow-hidden pb-24 pt-32 sm:pt-40 lg:pb-32 lg:pt-44">
                 <Aurora />
-                <ContourBackdrop seed={7} />
+                <IndexBackdrop seed={7} />
 
                 <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
                     <div className="grid items-center gap-16 lg:grid-cols-[1.05fr_1fr] lg:gap-12">

@@ -10,7 +10,7 @@ import Footer from '@/Components/Footer';
 import Reveal from '@/Components/ui/Reveal';
 import SpotlightCard from '@/Components/ui/SpotlightCard';
 import CountUp from '@/Components/ui/CountUp';
-import { PageShell, Aurora, ContourBackdrop, Section, SectionHeading } from '@/Components/ui/Backdrop';
+import { PageShell, Aurora, IndexBackdrop, Section, SectionHeading } from '@/Components/ui/Backdrop';
 
 const initialsFromName = (name = '') =>
     name.split(' ').filter(Boolean).slice(0, 2).map((p) => p.charAt(0).toUpperCase()).join('') || 'IN';
@@ -105,7 +105,7 @@ export default function Instructors({ auth, instructors: serverInstructors = [],
             {/* ===================== HERO ===================== */}
             <section className="relative overflow-hidden pb-16 pt-32 sm:pt-40">
                 <Aurora />
-                <ContourBackdrop seed={58} />
+                <IndexBackdrop seed={58} />
 
                 <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
                     <div className="max-w-2xl">

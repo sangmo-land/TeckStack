@@ -286,14 +286,14 @@
         opacity: 1;
     }
 
-    /* --- Contour field animation ------------------------------------
-       Three layers of instrumentation, deliberately slow. Every path
-       carries pathLength="1", so dash values are normalised and none of
-       this needs to measure the DOM.
+    /* --- B-tree index backdrop --------------------------------------
+       Structure draws itself in once; the seek highlight then loops,
+       lighting root → internal → leaf → chain in execution order.
        ----------------------------------------------------------------- */
 
-    /* 1. Plotter draw-in — the survey renders itself, once, on load. */
-    @keyframes contour-draw {
+    /* Edges plot themselves in on load. pathLength="1" normalises the dash
+       values, so this never has to measure the DOM. */
+    @keyframes btree-draw {
         from {
             stroke-dashoffset: 1;
         }
@@ -301,55 +301,47 @@
             stroke-dashoffset: 0;
         }
     }
-    .contour-draw {
+    .btree-draw {
         stroke-dasharray: 1;
-        animation: contour-draw 2.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+        animation: btree-draw 1.6s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
 
-    /* 2. Propagation front — each ring flashes briefly, staggered by radius,
-          so a wave visibly travels outward through the field. */
-    @keyframes contour-wave {
+    /* A seek step: rises quickly, holds while the descent continues past it,
+       then releases. Consecutive steps overlap, so the traversed path reads
+       as a lit trail rather than a single blinking node. */
+    @keyframes btree-seek {
         0% {
             opacity: 0;
         }
-        4% {
-            opacity: 0.26;
+        1.4% {
+            opacity: 1;
         }
-        12% {
+        9% {
+            opacity: 1;
+        }
+        14% {
             opacity: 0;
         }
         100% {
             opacity: 0;
         }
     }
-    .contour-wave {
+    .btree-seek {
         opacity: 0;
-        animation: contour-wave 11s ease-out infinite;
-    }
-
-    /* 3. Descent — a packet runs down a flow line, crossing every contour
-          at a right angle because it follows the true gradient. */
-    @keyframes contour-descend {
-        from {
-            stroke-dashoffset: 0;
-        }
-        to {
-            stroke-dashoffset: -1;
-        }
-    }
-    .contour-descend {
-        animation-name: contour-descend;
-        animation-timing-function: cubic-bezier(0.4, 0, 0.7, 1);
+        animation-name: btree-seek;
+        animation-timing-function: ease-out;
         animation-iteration-count: infinite;
     }
 
     /* The global reduced-motion rule collapses durations to ~0, which would
-       freeze the wave on its final (invisible) keyframe and strand a lone dash
-       on each flow line. Drop both moving layers and keep the static terrain. */
+       leave every seek highlight stuck on its final (invisible) keyframe and
+       strand the edges mid-draw. Show the finished structure, drop the seek. */
     @media (prefers-reduced-motion: reduce) {
-        .contour-wave,
-        .contour-descend {
+        .btree-seek {
             display: none;
+        }
+        .btree-draw {
+            stroke-dasharray: none;
         }
     }
 

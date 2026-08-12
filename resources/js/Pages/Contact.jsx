@@ -7,7 +7,7 @@ import Footer from '@/Components/Footer';
 import Reveal from '@/Components/ui/Reveal';
 import SpotlightCard from '@/Components/ui/SpotlightCard';
 import Field from '@/Components/ui/Field';
-import { PageShell, Aurora, ContourBackdrop, Section } from '@/Components/ui/Backdrop';
+import { PageShell, Aurora, IndexBackdrop, Section } from '@/Components/ui/Backdrop';
 
 const CHANNELS = [
     {
@@ -72,7 +72,7 @@ export default function Contact({ auth }) {
             {/* ===================== HERO ===================== */}
             <section className="relative overflow-hidden pb-14 pt-32 sm:pt-40">
                 <Aurora />
-                <ContourBackdrop seed={112} />
+                <IndexBackdrop seed={112} />
 
                 <div className="relative mx-auto max-w-3xl px-5 text-center sm:px-8">
                     <Reveal>

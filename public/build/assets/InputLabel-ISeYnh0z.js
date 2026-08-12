@@ -1,0 +1,1 @@
+import{j as m}from"./app-CBfP3bWF.js";function r({value:t,className:e="",children:n,...i}){return m.jsx("label",{...i,className:"block text-[13px] font-medium text-ink-dim "+e,children:t||n})}export{r as I};
