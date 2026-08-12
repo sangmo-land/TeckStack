@@ -6,7 +6,7 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import Reveal from '@/Components/ui/Reveal';
 import CourseCard, { CourseCardSkeleton } from '@/Components/ui/CourseCard';
-import { PageShell, Aurora, GridBackdrop, Section } from '@/Components/ui/Backdrop';
+import { PageShell, Aurora, ContourBackdrop, Section } from '@/Components/ui/Backdrop';
 
 const LEVELS = [
     { value: '', label: 'All levels' },
@@ -76,7 +76,7 @@ export default function CourseIndex({ courses: initialCourses, filters: initialF
                 ========================================================== */}
             <section className="relative overflow-hidden pb-12 pt-32 sm:pt-36">
                 <Aurora variant="quiet" />
-                <GridBackdrop />
+                <ContourBackdrop seed={23} />
 
                 <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
                     <Reveal>

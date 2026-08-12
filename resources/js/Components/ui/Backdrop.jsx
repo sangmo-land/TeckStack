@@ -35,13 +35,123 @@ export function Aurora({ className = '', variant = 'hero' }) {
     );
 }
 
-/** Engineering grid, faded top and bottom. */
+/** Engineering grid, faded top and bottom. Kept for interior/utility surfaces. */
 export function GridBackdrop({ className = '', size = 'lg' }) {
     return (
         <div
             aria-hidden="true"
             className={`pointer-events-none absolute inset-0 ${size === 'sm' ? 'bg-grid-sm' : 'bg-grid'} mask-fade-y ${className}`}
         />
+    );
+}
+
+/* ============================================================
+   TOPOGRAPHIC CONTOURS
+   Nested elevation rings, echoing the stacked-strata logo mark.
+
+   Each ring is a circle displaced by a sum of sine harmonics.
+   Because the displacement is *absolute* rather than proportional
+   to the ring's radius, every ring deforms by the same amount and
+   the contours stay parallel — they can never cross, which is what
+   separates a real contour map from a pile of wobbly circles.
+   ============================================================ */
+
+/** Deterministic PRNG (mulberry32) so the terrain is identical on every render. */
+function mulberry32(seed) {
+    return function () {
+        seed |= 0;
+        seed = (seed + 0x6d2b79f5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+function buildContours({
+    seed = 7,
+    rings = 24,
+    innerRadius = 38,
+    outerRadius = 580,
+    cx = 500,
+    cy = 400,
+    segments = 168,
+} = {}) {
+    const rand = mulberry32(seed);
+    const spacing = (outerRadius - innerRadius) / (rings - 1);
+
+    // Harmonic budget stays under half the ring spacing, guaranteeing no crossings.
+    const budget = spacing * 0.42;
+    const harmonics = [
+        { freq: 2, amp: budget * 0.44, phase: rand() * Math.PI * 2 },
+        { freq: 3, amp: budget * 0.30, phase: rand() * Math.PI * 2 },
+        { freq: 5, amp: budget * 0.16, phase: rand() * Math.PI * 2 },
+        { freq: 8, amp: budget * 0.10, phase: rand() * Math.PI * 2 },
+    ];
+
+    return Array.from({ length: rings }, (_, i) => {
+        const radius = innerRadius + i * spacing;
+        // A whisper of per-ring phase drift keeps the bands from looking machined.
+        const drift = i * 0.06;
+
+        let d = '';
+        for (let s = 0; s < segments; s++) {
+            const theta = (s / segments) * Math.PI * 2;
+            let displacement = 0;
+            for (const h of harmonics) {
+                displacement += h.amp * Math.sin(h.freq * theta + h.phase + drift);
+            }
+            const r = radius + displacement;
+            const x = cx + r * Math.cos(theta);
+            const y = cy + r * Math.sin(theta) * 0.72; // flatten: reads as terrain, not bullseye
+            d += `${s === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+        }
+        return { d: `${d}Z`, index: i };
+    });
+}
+
+/**
+ * Contour field for hero sections. Replaces the graph-paper grid.
+ */
+export function ContourBackdrop({ className = '', seed = 7, accentEvery = 6 }) {
+    const contours = React.useMemo(() => buildContours({ seed }), [seed]);
+    const total = contours.length;
+
+    return (
+        <div aria-hidden="true" className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
+            <svg
+                className="absolute left-1/2 top-1/2 h-[135%] w-[135%] -translate-x-1/2 -translate-y-1/2 animate-contour-breathe"
+                viewBox="0 0 1000 800"
+                preserveAspectRatio="xMidYMid slice"
+                fill="none"
+                style={{
+                    // Gentler than the shared .mask-radial: the elevation ramp below
+                    // already fades the outer bands, so a hard mask double-dips and
+                    // erases the field entirely.
+                    WebkitMaskImage:
+                        'radial-gradient(ellipse 78% 82% at 50% 45%, #000 50%, transparent 100%)',
+                    maskImage:
+                        'radial-gradient(ellipse 78% 82% at 50% 45%, #000 50%, transparent 100%)',
+                }}
+            >
+                {contours.map(({ d, index }) => {
+                    // Elevation ramp: brightest at the peak, dissolving outward.
+                    const t = index / (total - 1);
+                    const fade = Math.pow(1 - t, 1.35);
+                    const accent = index % accentEvery === 0;
+
+                    return (
+                        <path
+                            key={index}
+                            d={d}
+                            stroke={accent ? 'rgb(34,211,238)' : 'rgb(148,163,184)'}
+                            strokeWidth={accent ? 1.15 : 0.85}
+                            opacity={(accent ? 0.30 : 0.26) * (0.34 + fade * 0.66)}
+                            vectorEffect="non-scaling-stroke"
+                        />
+                    );
+                })}
+            </svg>
+        </div>
     );
 }
 

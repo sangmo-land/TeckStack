@@ -127,6 +127,12 @@ export default {
                     '0%': { transform: 'translateY(40%)', opacity: '0' },
                     '100%': { transform: 'translateY(0)', opacity: '1' },
                 },
+                // Contours drift as if the terrain were being resurveyed — slow
+                // enough to register as depth rather than as animation.
+                'contour-breathe': {
+                    '0%,100%': { transform: 'translate(-50%,-50%) scale(1) rotate(0deg)' },
+                    '50%': { transform: 'translate(-50%,-50%) scale(1.045) rotate(1.2deg)' },
+                },
             },
 
             animation: {
@@ -139,6 +145,7 @@ export default {
                 'fade-up': 'fade-up 0.6s cubic-bezier(0.16,1,0.3,1) both',
                 'caret-blink': 'caret-blink 1.1s step-end infinite',
                 'ticker-flip': 'ticker-flip 0.4s cubic-bezier(0.16,1,0.3,1) both',
+                'contour-breathe': 'contour-breathe 34s ease-in-out infinite',
             },
 
             transitionTimingFunction: {

@@ -9,7 +9,7 @@ import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
 import Reveal from '@/Components/ui/Reveal';
 import SpotlightCard from '@/Components/ui/SpotlightCard';
-import { PageShell, Aurora, GridBackdrop, Section, SectionHeading } from '@/Components/ui/Backdrop';
+import { PageShell, Aurora, ContourBackdrop, Section, SectionHeading } from '@/Components/ui/Backdrop';
 
 const PLANS = [
     {
@@ -105,7 +105,7 @@ export default function Pricing({ auth }) {
             {/* ===================== HERO ===================== */}
             <section className="relative overflow-hidden pb-16 pt-32 sm:pt-40">
                 <Aurora />
-                <GridBackdrop />
+                <ContourBackdrop seed={94} />
 
                 <div className="relative mx-auto max-w-4xl px-5 text-center sm:px-8">
                     <Reveal>
