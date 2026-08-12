@@ -1,31 +1,31 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import Navbar from '@/Components/Navbar';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import Logo from '@/Components/ui/Logo';
 import { Link, usePage } from '@inertiajs/react';
+import { ChevronDown, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children, useMarketingNavbar = false }) {
     const { auth = {} } = usePage().props;
     const user = auth.user;
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+
+    // Shared page header treatment for both variants.
+    const pageHeader = header && (
+        <header className="border-b border-hairline bg-void-50/40">
+            <div className="mx-auto max-w-7xl px-5 py-6 sm:px-8">{header}</div>
+        </header>
+    );
 
     if (useMarketingNavbar) {
         return (
-            <div className="min-h-screen bg-gray-100">
+            <div className="texture-grain min-h-screen bg-void text-ink">
                 <Navbar auth={auth} startSolid />
-                <div className="pt-24">
-                    {header && (
-                        <header className="bg-white shadow">
-                            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                                {header}
-                            </div>
-                        </header>
-                    )}
-
+                <div className="pt-16">
+                    {pageHeader}
                     <main>{children}</main>
                 </div>
             </div>
@@ -33,22 +33,17 @@ export default function AuthenticatedLayout({ header, children, useMarketingNavb
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="texture-grain min-h-screen bg-void text-ink">
+            <nav className="glass sticky top-0 z-40 border-b">
+                <div className="mx-auto max-w-7xl px-5 sm:px-8">
                     <div className="flex h-16 justify-between">
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
+                                <Logo />
                             </div>
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink
-                                    href={route('dashboard')}
-                                    active={route().current('dashboard')}
-                                >
+                            <div className="hidden sm:-my-px sm:ms-10 sm:flex sm:space-x-8">
+                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
                                     Dashboard
                                 </NavLink>
                             </div>
@@ -58,39 +53,27 @@ export default function AuthenticatedLayout({ header, children, useMarketingNavb
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="-me-0.5 ms-2 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
+                                        <button
+                                            type="button"
+                                            className="group inline-flex items-center gap-2 rounded-lg border border-hairline bg-white/[0.02] px-3 py-2 text-sm font-medium text-ink-dim transition-all duration-300 hover:border-hairline-strong hover:text-ink"
+                                        >
+                                            {user?.name}
+                                            <ChevronDown className="h-3.5 w-3.5 text-ink-ghost transition-colors group-hover:text-ink-dim" />
+                                        </button>
                                     </Dropdown.Trigger>
 
-                                    <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
-                                        >
-                                            Profile
-                                        </Dropdown.Link>
+                                    <Dropdown.Content width="56">
+                                        <div className="border-b border-hairline px-4 py-3">
+                                            <p className="truncate text-sm font-medium text-ink">{user?.name}</p>
+                                            <p className="truncate font-mono text-[11px] text-ink-ghost">{user?.email}</p>
+                                        </div>
+                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
+                                        <div className="my-1 h-px bg-hairline" />
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"
                                             as="button"
+                                            className="hover:!text-alert"
                                         >
                                             Log Out
                                         </Dropdown.Link>
@@ -101,81 +84,33 @@ export default function AuthenticatedLayout({ header, children, useMarketingNavb
 
                         <div className="-me-2 flex items-center sm:hidden">
                             <button
-                                onClick={() =>
-                                    setShowingNavigationDropdown(
-                                        (previousState) => !previousState,
-                                    )
-                                }
-                                className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 transition duration-150 ease-in-out hover:bg-gray-100 hover:text-gray-500 focus:bg-gray-100 focus:text-gray-500 focus:outline-none"
+                                onClick={() => setShowingNavigationDropdown((s) => !s)}
+                                className="rounded-lg p-2 text-ink-faint transition-colors hover:bg-white/[0.05] hover:text-ink"
+                                aria-label="Menu"
+                                aria-expanded={showingNavigationDropdown}
                             >
-                                <svg
-                                    className="h-6 w-6"
-                                    stroke="currentColor"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
+                                {showingNavigationDropdown ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div
-                    className={
-                        (showingNavigationDropdown ? 'block' : 'hidden') +
-                        ' sm:hidden'
-                    }
-                >
-                    <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink
-                            href={route('dashboard')}
-                            active={route().current('dashboard')}
-                        >
+                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' border-t border-hairline sm:hidden'}>
+                    <div className="space-y-1 px-3 pb-3 pt-3">
+                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
                             Dashboard
                         </ResponsiveNavLink>
                     </div>
 
-                    <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
-                            </div>
+                    <div className="border-t border-hairline px-3 pb-3 pt-4">
+                        <div className="px-2">
+                            <div className="text-sm font-medium text-ink">{user?.name}</div>
+                            <div className="font-mono text-[11px] text-ink-ghost">{user?.email}</div>
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
-                            </ResponsiveNavLink>
-                            <ResponsiveNavLink
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                            >
+                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
+                            <ResponsiveNavLink method="post" href={route('logout')} as="button">
                                 Log Out
                             </ResponsiveNavLink>
                         </div>
@@ -183,13 +118,7 @@ export default function AuthenticatedLayout({ header, children, useMarketingNavb
                 </div>
             </nav>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                        {header}
-                    </div>
-                </header>
-            )}
+            {pageHeader}
 
             <main>{children}</main>
         </div>

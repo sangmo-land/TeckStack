@@ -1,121 +1,162 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import { GraduationCap, Mail } from 'lucide-react';
+import { Mail, Phone, ArrowUpRight, ArrowUp } from 'lucide-react';
+import { LogoMark } from '@/Components/ui/Logo';
+
+const COLUMNS = [
+    {
+        title: 'Platform',
+        links: [
+            { label: 'All courses', href: '/courses' },
+            { label: 'Instructors', href: '/instructors' },
+            { label: 'Pricing', href: '/pricing' },
+        ],
+    },
+    {
+        title: 'Company',
+        links: [
+            { label: 'About', href: '/about' },
+            { label: 'Contact', href: '/contact' },
+        ],
+    },
+    {
+        title: 'Tracks',
+        links: [
+            { label: 'Oracle', href: '/courses?search=Oracle' },
+            { label: 'MySQL', href: '/courses?search=MySQL' },
+            { label: 'AWS', href: '/courses?search=AWS' },
+        ],
+    },
+];
 
 export default function Footer() {
-    const currentYear = new Date().getFullYear();
+    const year = new Date().getFullYear();
 
     return (
-        <footer className="bg-slate-950 border-t border-slate-800/50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Main Footer Content */}
-                <div className="py-6 sm:py-10">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12">
-                        {/* Brand */}
-                        <div>
-                            <Link
-                                href="/"
-                                className="flex items-center space-x-2 mb-2 sm:mb-3"
-                            >
-                                <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-1.5 rounded">
-                                    <GraduationCap className="w-5 h-5 text-white" />
-                                </div>
-                                <span className="font-bold text-white">
-                                    NelnadoSolutions
-                                </span>
-                            </Link>
-                            <p className="text-slate-400 text-sm leading-relaxed">
-                                Quality education at scale.
-                            </p>
-                        </div>
+        <footer className="relative overflow-hidden border-t border-hairline bg-void">
+            {/* Ambient floor light */}
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-80"
+                style={{ background: 'radial-gradient(60% 100% at 50% 100%, rgba(34,211,238,0.10), transparent 70%)' }}
+            />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid mask-fade-b opacity-40" />
 
-                        {/* Links */}
-                        <div className="hidden md:grid grid-cols-2 gap-6">
-                            <div>
-                                <h4 className="text-white text-xs font-semibold uppercase tracking-wide mb-3">
-                                    Product
-                                </h4>
-                                <ul className="space-y-2">
-                                    <li>
+            <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+                {/* ===== Top: brand + columns ========================== */}
+                <div className="grid grid-cols-2 gap-x-8 gap-y-12 py-16 md:grid-cols-12 lg:py-20">
+                    {/* Brand */}
+                    <div className="col-span-2 md:col-span-5 lg:col-span-4">
+                        <Link href="/" className="inline-flex items-center gap-2.5">
+                            <LogoMark className="h-8 w-8" />
+                            <span className="font-display text-[1.0625rem] font-semibold tracking-tighter text-ink">
+                                Nelnado<span className="text-ink-faint">Solutions</span>
+                            </span>
+                        </Link>
+
+                        <p className="mt-5 max-w-xs text-sm leading-relaxed text-ink-faint">
+                            Deep technical training in databases and cloud infrastructure — built by engineers
+                            who run these systems in production.
+                        </p>
+
+                        {/* Live status — the detail that signals a real operating product */}
+                        <div className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-hairline bg-white/[0.02] py-1.5 pl-2.5 pr-3.5">
+                            <span className="relative flex h-1.5 w-1.5">
+                                <span className="absolute inline-flex h-full w-full animate-pulse-ring rounded-full bg-signal" />
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-signal" />
+                            </span>
+                            <span className="font-mono text-[10px] uppercase tracking-mono text-ink-dim">
+                                All systems operational
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="hidden lg:col-span-1 lg:block" />
+
+                    {/* Link columns */}
+                    {COLUMNS.map((col) => (
+                        <div key={col.title} className="md:col-span-2 lg:col-span-2">
+                            <h4 className="font-mono text-[10px] uppercase tracking-mono text-ink-ghost">{col.title}</h4>
+                            <ul className="mt-4 space-y-3">
+                                {col.links.map((link) => (
+                                    <li key={link.label}>
                                         <Link
-                                            href="/courses"
-                                            className="text-slate-400 hover:text-white text-sm transition-colors"
+                                            href={link.href}
+                                            className="group inline-flex items-center gap-1 text-sm text-ink-faint transition-colors duration-300 hover:text-ink"
                                         >
-                                            Courses
+                                            {link.label}
+                                            <ArrowUpRight className="h-3 w-3 -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
                                         </Link>
                                     </li>
-                                    <li>
-                                        <Link
-                                            href="/about"
-                                            className="text-slate-400 hover:text-white text-sm transition-colors"
-                                        >
-                                            About
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="text-white text-xs font-semibold uppercase tracking-wide mb-3">
-                                    Support
-                                </h4>
-                                <ul className="space-y-2">
-                                    <li>
-                                        <a
-                                            href="mailto:mokomnelvis@yahoo.com"
-                                            className="text-slate-400 hover:text-white text-sm transition-colors inline-flex items-center gap-1"
-                                        >
-                                            <Mail size={13} />
-                                            Contact
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a
-                                            href="tel:+12409060295"
-                                            className="text-slate-400 hover:text-white text-sm transition-colors"
-                                        >
-                                            +1 (240) 906-0295
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                                ))}
+                            </ul>
                         </div>
+                    ))}
 
-                        {/* Contact Info */}
-                        <div className="hidden md:block">
-                            <h4 className="text-white text-xs font-semibold uppercase tracking-wide mb-3">
-                                Connect
-                            </h4>
-                            <p className="text-slate-400 text-sm mb-2">
-                                Get in touch with us
-                            </p>
-                            <a
-                                href="mailto:mokomnelvis@yahoo.com"
-                                className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
-                            >
-                                mokomnelvis@yahoo.com
-                            </a>
-                        </div>
+                    {/* Contact */}
+                    <div className="col-span-2 md:col-span-3 lg:col-span-3">
+                        <h4 className="font-mono text-[10px] uppercase tracking-mono text-ink-ghost">Get in touch</h4>
+                        <ul className="mt-4 space-y-3">
+                            <li>
+                                <a
+                                    href="mailto:mokomnelvis@yahoo.com"
+                                    className="group inline-flex items-center gap-2 text-sm text-ink-faint transition-colors hover:text-flux"
+                                >
+                                    <Mail className="h-3.5 w-3.5" />
+                                    mokomnelvis@yahoo.com
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="tel:+12409060295"
+                                    className="group inline-flex items-center gap-2 text-sm text-ink-faint transition-colors hover:text-flux"
+                                >
+                                    <Phone className="h-3.5 w-3.5" />
+                                    +1 (240) 906-0295
+                                </a>
+                            </li>
+                        </ul>
+
+                        <Link href="/register" className="btn-ghost mt-6 w-full sm:w-auto">
+                            Start learning
+                            <ArrowUpRight className="h-3.5 w-3.5" />
+                        </Link>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="py-4 sm:py-6 border-t border-slate-800/50 flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4 text-slate-500 text-xs">
-                    <p>
-                        © {currentYear} NelnadoSolutions. All rights reserved.
+                {/* ===== Oversized wordmark — the signature move ======== */}
+                <div className="relative select-none pb-2" aria-hidden="true">
+                    <div
+                        className="bg-clip-text text-center font-display text-[17vw] font-bold leading-[0.78] tracking-tightest text-transparent lg:text-[13rem]"
+                        style={{
+                            backgroundImage:
+                                'linear-gradient(to bottom, rgba(232,238,246,0.10), rgba(232,238,246,0.015) 62%, transparent)',
+                        }}
+                    >
+                        NELNADO
+                    </div>
+                </div>
+
+                {/* ===== Bottom bar ==================================== */}
+                <div className="flex flex-col-reverse items-center justify-between gap-4 border-t border-hairline py-6 sm:flex-row">
+                    <p className="font-mono text-[11px] text-ink-ghost">
+                        © {year} NelnadoSolutions — All rights reserved
                     </p>
-                    <div className="flex gap-4 sm:gap-6">
-                        <Link
-                            href={route("privacy")}
-                            className="hover:text-white transition-colors"
-                        >
+
+                    <div className="flex items-center gap-6">
+                        <Link href={route('privacy')} className="font-mono text-[11px] text-ink-ghost transition-colors hover:text-ink">
                             Privacy
                         </Link>
-                        <Link
-                            href={route("terms")}
-                            className="hover:text-white transition-colors"
-                        >
+                        <Link href={route('terms')} className="font-mono text-[11px] text-ink-ghost transition-colors hover:text-ink">
                             Terms
                         </Link>
+                        <button
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className="group flex h-8 w-8 items-center justify-center rounded-lg border border-hairline text-ink-ghost transition-all duration-300 hover:border-flux/40 hover:text-flux"
+                            aria-label="Back to top"
+                        >
+                            <ArrowUp className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5" />
+                        </button>
                     </div>
                 </div>
             </div>

@@ -1,209 +1,425 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from '@inertiajs/react';
-import { Star, Users, Clock, TrendingUp } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import {
+    ArrowRight, ArrowUpRight, TrendingUp, Award, Terminal as TerminalIcon,
+    ShieldCheck, GitBranch, Gauge, Layers, Play,
+} from 'lucide-react';
+
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
+import Reveal from '@/Components/ui/Reveal';
+import SpotlightCard from '@/Components/ui/SpotlightCard';
+import CountUp from '@/Components/ui/CountUp';
+import Marquee from '@/Components/ui/Marquee';
+import Terminal from '@/Components/ui/Terminal';
+import CourseCard, { CourseCardSkeleton } from '@/Components/ui/CourseCard';
+import { PageShell, Aurora, GridBackdrop, Section, SectionHeading } from '@/Components/ui/Backdrop';
+
+// NOTE: placeholder marketing figures — swap for real values before launch.
+const STATS = [
+    { value: 500, suffix: '+', label: 'Expert courses', sub: 'across 9 tracks' },
+    { value: 50, suffix: 'K+', label: 'Active learners', sub: 'in 40+ countries' },
+    { value: 4.8, decimals: 1, label: 'Average rating', sub: 'from 12k reviews' },
+    { value: 100, suffix: '%', label: 'Lifetime access', sub: 'no subscription' },
+];
+
+const TECHNOLOGIES = [
+    'Oracle', 'MySQL', 'PostgreSQL', 'AWS', 'PL/SQL', 'MongoDB',
+    'Redis', 'Snowflake', 'Kubernetes', 'Terraform',
+];
+
+const CAPABILITIES = [
+    {
+        icon: TerminalIcon,
+        title: 'Live query sandboxes',
+        body: 'Every lesson ships with a seeded database you can break, tune, and restore — no local setup, no sample-data theatre.',
+        span: 'lg:col-span-3',
+        accent: 'flux',
+    },
+    {
+        icon: Gauge,
+        title: 'Real performance work',
+        body: 'Read execution plans, chase down lock contention, and tune indexes against tables large enough to actually behave like production.',
+        span: 'lg:col-span-3',
+        accent: 'pulse',
+    },
+    {
+        icon: GitBranch,
+        title: 'Versioned curriculum',
+        body: 'Courses track upstream releases. When Oracle ships a new optimiser, the module gets rewritten — not appended to.',
+        span: 'lg:col-span-2',
+        accent: 'flux',
+    },
+    {
+        icon: ShieldCheck,
+        title: 'Verified certificates',
+        body: 'Assessed on working systems, not multiple choice.',
+        span: 'lg:col-span-2',
+        accent: 'pulse',
+    },
+    {
+        icon: Layers,
+        title: 'Structured tracks',
+        body: 'Sequenced paths from fundamentals to production ownership.',
+        span: 'lg:col-span-2',
+        accent: 'flux',
+    },
+];
+
+const PATH = [
+    { step: '01', title: 'Assess', body: 'A short diagnostic places you at the right depth so you skip what you already run daily.' },
+    { step: '02', title: 'Build', body: 'Work through graded labs against live instances — every module ends in something that runs.' },
+    { step: '03', title: 'Prove', body: 'Sit a practical assessment on a real system and earn a certificate tied to that work.' },
+];
 
 export default function Home({ auth }) {
-    const [trendingCourses, setTrendingCourses] = useState([]);
-    const [recommendedCourses, setRecommendedCourses] = useState([]);
+    const [trending, setTrending] = useState([]);
+    const [recommended, setRecommended] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         Promise.all([
-            fetch('/api/trending-courses').then(r => r.json()),
-            fetch('/api/recommended-courses').then(r => r.json()),
-        ]).then(([trending, recommended]) => {
-            setTrendingCourses(trending.courses);
-            setRecommendedCourses(recommended.courses);
-            setLoading(false);
-        });
+            fetch('/api/trending-courses').then((r) => r.json()),
+            fetch('/api/recommended-courses').then((r) => r.json()),
+        ])
+            .then(([t, r]) => {
+                setTrending(t.courses || []);
+                setRecommended(r.courses || []);
+            })
+            .catch(() => {
+                setTrending([]);
+                setRecommended([]);
+            })
+            .finally(() => setLoading(false));
     }, []);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <PageShell>
+            <Head title="Master database and cloud engineering" />
             <Navbar auth={auth} />
-            {/* Hero Section */}
-            <section className="relative overflow-hidden px-4 sm:px-6 lg:px-8 pt-32 pb-32">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-3xl" />
-                
-                <div className="relative max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+
+            {/* ==========================================================
+                HERO
+                ========================================================== */}
+            <section className="relative overflow-hidden pb-24 pt-32 sm:pt-40 lg:pb-32 lg:pt-44">
+                <Aurora />
+                <GridBackdrop />
+
+                <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+                    <div className="grid items-center gap-16 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
+                        {/* --- Copy ------------------------------------- */}
                         <div>
-                            <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                                Master <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Tech Skills</span> Today
-                            </h1>
-                            <p className="text-xl text-slate-300 mb-8 leading-relaxed">
-                                Learn AWS, Oracle, Database Management, and more from industry experts. Get certified and advance your tech career.
-                            </p>
-                            <div className="flex gap-4">
-                                <Link 
+                            <Reveal>
+                                <Link
                                     href="/courses"
-                                    className="px-8 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
+                                    className="group inline-flex items-center gap-2.5 rounded-full border border-hairline bg-white/[0.03] py-1.5 pl-2 pr-3.5 backdrop-blur-sm transition-colors duration-300 hover:border-flux/30"
                                 >
-                                    Explore Courses
+                                    <span className="rounded-full bg-flux/15 px-2 py-0.5 font-mono text-[10px] uppercase tracking-mono text-flux">
+                                        New
+                                    </span>
+                                    <span className="text-[13px] text-ink-dim">Oracle 23ai track is live</span>
+                                    <ArrowRight className="h-3 w-3 text-ink-ghost transition-transform duration-300 group-hover:translate-x-0.5" />
                                 </Link>
-                                <button className="px-8 py-3 border-2 border-slate-400 text-slate-300 font-semibold rounded-lg hover:border-white hover:text-white transition-colors">
-                                    Learn More
-                                </button>
-                            </div>
+                            </Reveal>
+
+                            <Reveal delay={80}>
+                                <h1 className="mt-7 font-display text-[2.85rem] font-semibold leading-[1.02] tracking-tightest text-ink sm:text-[3.75rem] lg:text-[4.25rem]">
+                                    Engineer the
+                                    <br />
+                                    systems that
+                                    <br />
+                                    <span className="text-gradient">everything runs on.</span>
+                                </h1>
+                            </Reveal>
+
+                            <Reveal delay={160}>
+                                <p className="mt-7 max-w-lg text-[17px] leading-relaxed text-ink-dim">
+                                    Deep, practical training in Oracle, MySQL, and cloud data infrastructure —
+                                    taught against live systems by engineers who operate them in production.
+                                </p>
+                            </Reveal>
+
+                            <Reveal delay={240}>
+                                <div className="mt-9 flex flex-wrap items-center gap-3">
+                                    <Link href="/courses" className="btn-flux group">
+                                        Explore courses
+                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                                    </Link>
+                                    <Link href="/about" className="btn-ghost group">
+                                        <Play className="h-3.5 w-3.5 fill-current" />
+                                        How it works
+                                    </Link>
+                                </div>
+                            </Reveal>
+
+                            {/* Trust strip */}
+                            <Reveal delay={320}>
+                                <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-hairline pt-7">
+                                    {[
+                                        { icon: Award, text: 'Verified certificates' },
+                                        { icon: TerminalIcon, text: 'Hands-on labs' },
+                                        { icon: TrendingUp, text: 'Updated quarterly' },
+                                    ].map(({ icon: Icon, text }) => (
+                                        <span key={text} className="inline-flex items-center gap-2 text-[13px] text-ink-faint">
+                                            <Icon className="h-3.5 w-3.5 text-flux/70" />
+                                            {text}
+                                        </span>
+                                    ))}
+                                </div>
+                            </Reveal>
                         </div>
-                        
-                        <div className="relative h-96 hidden lg:block">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur-3xl opacity-20" />
-                            <div className="relative bg-slate-800 border border-slate-700 rounded-2xl p-8 h-full flex flex-col justify-center items-center">
-                                <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20 mb-4" />
-                                <p className="text-slate-300 text-center">Premium learning platform for tech professionals</p>
-                            </div>
-                        </div>
+
+                        {/* --- Console ---------------------------------- */}
+                        <Reveal delay={200} direction="left" distance={28}>
+                            <Terminal className="lg:translate-y-2" />
+                        </Reveal>
                     </div>
                 </div>
             </section>
 
-            {/* Stats Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-16 bg-slate-800/50">
-                <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-                    <div className="text-center">
-                        <div className="text-4xl font-bold text-blue-400 mb-2">500+</div>
-                        <p className="text-slate-300">Expert Courses</p>
-                    </div>
-                    <div className="text-center">
-                        <div className="text-4xl font-bold text-purple-400 mb-2">50K+</div>
-                        <p className="text-slate-300">Active Students</p>
-                    </div>
-                    <div className="text-center">
-                        <div className="text-4xl font-bold text-blue-400 mb-2">4.8</div>
-                        <p className="text-slate-300">Avg Rating</p>
-                    </div>
-                    <div className="text-center">
-                        <div className="text-4xl font-bold text-purple-400 mb-2">100%</div>
-                        <p className="text-slate-300">Lifetime Access</p>
-                    </div>
-                </div>
-            </section>
-
-            {/* Trending Courses */}
-            <section className="px-4 sm:px-6 lg:px-8 py-16">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center justify-between mb-12">
-                        <div>
-                            <h2 className="text-4xl font-bold text-white mb-2">Trending Now</h2>
-                            <p className="text-slate-400">Most popular courses this month</p>
-                        </div>
-                        <Link href="/courses?sort=popular" className="text-blue-400 hover:text-blue-300">
-                            View All →
-                        </Link>
-                    </div>
-
-                    {!loading && trendingCourses.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {trendingCourses.map(course => (
-                                <CourseCard key={course.id} course={course} />
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </section>
-
-            {/* Recommended Courses */}
-            <section className="px-4 sm:px-6 lg:px-8 py-16 bg-slate-800/30">
-                <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center justify-between mb-12">
-                        <div>
-                            <h2 className="text-4xl font-bold text-white mb-2">Top Rated</h2>
-                            <p className="text-slate-400">Highest rated courses by our community</p>
-                        </div>
-                        <Link href="/courses?sort=rating" className="text-blue-400 hover:text-blue-300">
-                            View All →
-                        </Link>
-                    </div>
-
-                    {!loading && recommendedCourses.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {recommendedCourses.map(course => (
-                                <CourseCard key={course.id} course={course} />
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-20">
-                <div className="max-w-4xl mx-auto bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-12 text-center">
-                    <h2 className="text-4xl font-bold text-white mb-4">Ready to Transform Your Career?</h2>
-                    <p className="text-xl text-blue-100 mb-8">
-                        Join thousands of professionals who are advancing their tech skills with our premium courses.
+            {/* ==========================================================
+                TECHNOLOGY MARQUEE
+                ========================================================== */}
+            <section className="relative border-y border-hairline bg-void-50/40 py-10">
+                <div className="mx-auto mb-7 max-w-7xl px-5 sm:px-8">
+                    <p className="text-center font-mono text-[10px] uppercase tracking-mono text-ink-ghost">
+                        Curriculum covers
                     </p>
-                    <Link 
-                        href="/courses"
-                        className="inline-block px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:shadow-lg transition-all duration-300"
-                    >
-                        Start Learning Now
-                    </Link>
+                </div>
+                <Marquee speed={42}>
+                    {TECHNOLOGIES.map((tech) => (
+                        <span
+                            key={tech}
+                            className="mx-8 whitespace-nowrap font-display text-2xl font-medium tracking-tighter text-ink-ghost transition-colors duration-500 hover:text-ink sm:text-3xl"
+                        >
+                            {tech}
+                        </span>
+                    ))}
+                </Marquee>
+            </section>
+
+            {/* ==========================================================
+                STATS
+                ========================================================== */}
+            <Section className="py-20 lg:py-24">
+                <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-hairline bg-white/[0.04] lg:grid-cols-4">
+                    {STATS.map((stat, i) => (
+                        <Reveal key={stat.label} delay={i * 90} className="bg-void">
+                            <div className="group relative h-full px-6 py-9 transition-colors duration-500 hover:bg-white/[0.02]">
+                                <div className="font-display text-4xl font-semibold tracking-tightest text-ink sm:text-[2.75rem]">
+                                    <CountUp to={stat.value} decimals={stat.decimals || 0} suffix={stat.suffix || ''} />
+                                </div>
+                                <p className="mt-2.5 text-sm font-medium text-ink-dim">{stat.label}</p>
+                                <p className="mt-0.5 font-mono text-[11px] text-ink-ghost">{stat.sub}</p>
+                                <span className="absolute inset-x-6 bottom-0 h-px scale-x-0 bg-gradient-to-r from-flux to-transparent transition-transform duration-500 ease-out group-hover:scale-x-100" />
+                            </div>
+                        </Reveal>
+                    ))}
+                </div>
+            </Section>
+
+            {/* ==========================================================
+                TRENDING
+                ========================================================== */}
+            <Section className="py-14 lg:py-20">
+                <Reveal>
+                    <SectionHeading
+                        eyebrow="Trending now"
+                        title="What engineers are learning this month"
+                        lede="Ranked by active enrolment across all tracks."
+                        action={
+                            <Link href="/courses?sort=popular" className="group inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-flux">
+                                View all
+                                <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            </Link>
+                        }
+                    />
+                </Reveal>
+
+                <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    {loading
+                        ? [...Array(4)].map((_, i) => <CourseCardSkeleton key={i} />)
+                        : trending.map((course, i) => (
+                              <Reveal key={course.id} delay={i * 90}>
+                                  <CourseCard course={course} />
+                              </Reveal>
+                          ))}
+                </div>
+
+                {!loading && trending.length === 0 && <EmptyRail />}
+            </Section>
+
+            {/* ==========================================================
+                CAPABILITIES — bento
+                ========================================================== */}
+            <Section className="py-20 lg:py-28">
+                <Reveal>
+                    <SectionHeading
+                        eyebrow="Why it works"
+                        title="Training that behaves like the job"
+                        lede="Most courses teach syntax. These put you in front of a system that is already misbehaving and expect you to fix it."
+                        align="center"
+                    />
+                </Reveal>
+
+                <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-6">
+                    {CAPABILITIES.map((cap, i) => {
+                        const Icon = cap.icon;
+                        const accentRGB = cap.accent === 'pulse' ? '139,124,255' : '34,211,238';
+                        return (
+                            <Reveal key={cap.title} delay={i * 80} className={cap.span}>
+                                <SpotlightCard
+                                    spotlightColor={accentRGB}
+                                    className="panel panel-hover h-full rounded-2xl p-7"
+                                >
+                                    <span
+                                        className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border"
+                                        style={{
+                                            borderColor: `rgba(${accentRGB},0.25)`,
+                                            background: `radial-gradient(circle at 30% 25%, rgba(${accentRGB},0.22), rgba(${accentRGB},0.04))`,
+                                        }}
+                                    >
+                                        <Icon className="h-5 w-5" style={{ color: `rgb(${accentRGB})` }} />
+                                    </span>
+                                    <h3 className="font-display text-lg font-semibold tracking-tighter text-ink">{cap.title}</h3>
+                                    <p className="mt-2.5 text-sm leading-relaxed text-ink-faint">{cap.body}</p>
+                                </SpotlightCard>
+                            </Reveal>
+                        );
+                    })}
+                </div>
+            </Section>
+
+            {/* ==========================================================
+                LEARNING PATH
+                ========================================================== */}
+            <section className="relative overflow-hidden border-y border-hairline bg-void-50/30 py-20 lg:py-28">
+                <Aurora variant="quiet" />
+                <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+                    <Reveal>
+                        <SectionHeading eyebrow="The path" title="Three moves from curious to production-ready" align="center" />
+                    </Reveal>
+
+                    <div className="relative mt-16">
+                        {/* Connector rail — desktop only */}
+                        <div
+                            aria-hidden="true"
+                            className="absolute left-0 right-0 top-7 hidden h-px lg:block"
+                            style={{ background: 'linear-gradient(90deg, transparent, rgba(34,211,238,0.35) 15%, rgba(139,124,255,0.35) 85%, transparent)' }}
+                        />
+
+                        <div className="grid gap-12 lg:grid-cols-3 lg:gap-10">
+                            {PATH.map((item, i) => (
+                                <Reveal key={item.step} delay={i * 140}>
+                                    <div className="relative">
+                                        <span className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full border border-flux/25 bg-void font-mono text-sm text-flux">
+                                            {item.step}
+                                            <span className="absolute inset-0 animate-pulse-ring rounded-full border border-flux/40" style={{ animationDelay: `${i * 0.7}s` }} />
+                                        </span>
+                                        <h3 className="mt-6 font-display text-xl font-semibold tracking-tighter text-ink">{item.title}</h3>
+                                        <p className="mt-2.5 max-w-sm text-sm leading-relaxed text-ink-faint">{item.body}</p>
+                                    </div>
+                                </Reveal>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </section>
+
+            {/* ==========================================================
+                TOP RATED
+                ========================================================== */}
+            <Section className="py-20 lg:py-24">
+                <Reveal>
+                    <SectionHeading
+                        eyebrow="Top rated"
+                        title="Highest rated by the people who finished them"
+                        lede="Only courses with 50 or more completed enrolments are eligible."
+                        action={
+                            <Link href="/courses?sort=rating" className="group inline-flex items-center gap-1.5 text-sm text-ink-dim transition-colors hover:text-flux">
+                                View all
+                                <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                            </Link>
+                        }
+                    />
+                </Reveal>
+
+                <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {loading
+                        ? [...Array(3)].map((_, i) => <CourseCardSkeleton key={i} />)
+                        : recommended.map((course, i) => (
+                              <Reveal key={course.id} delay={i * 100}>
+                                  <CourseCard course={course} />
+                              </Reveal>
+                          ))}
+                </div>
+
+                {!loading && recommended.length === 0 && <EmptyRail />}
+            </Section>
+
+            {/* ==========================================================
+                CTA
+                ========================================================== */}
+            <Section className="pb-28 pt-10">
+                <Reveal>
+                    <SpotlightCard
+                        radius={620}
+                        intensity={0.12}
+                        className="relative overflow-hidden rounded-3xl border border-hairline-strong bg-void-100 px-6 py-20 text-center sm:px-16"
+                    >
+                        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid-sm opacity-50 mask-radial" />
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-x-0 -bottom-40 h-80 blur-3xl"
+                            style={{ background: 'radial-gradient(closest-side, rgba(34,211,238,0.26), transparent 70%)' }}
+                        />
+
+                        <div className="relative mx-auto max-w-2xl">
+                            <div className="mb-6 flex justify-center">
+                                <span className="chip-flux">
+                                    <span className="h-1 w-1 rounded-full bg-flux" />
+                                    Enrolment open
+                                </span>
+                            </div>
+
+                            <h2 className="font-display text-[2.25rem] font-semibold leading-[1.05] tracking-tightest text-ink sm:text-[3rem]">
+                                Stop reading about databases.
+                                <br />
+                                <span className="text-gradient-flux">Start running them.</span>
+                            </h2>
+
+                            <p className="mx-auto mt-6 max-w-lg text-[15px] leading-relaxed text-ink-dim">
+                                Full lifetime access, hands-on labs from the first lesson, and a certificate
+                                that reflects work you actually did.
+                            </p>
+
+                            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+                                <Link href={auth?.user ? '/courses' : '/register'} className="btn-flux group">
+                                    {auth?.user ? 'Browse the catalogue' : 'Create free account'}
+                                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                                </Link>
+                                <Link href="/pricing" className="btn-ghost">See pricing</Link>
+                            </div>
+
+                            <p className="mt-7 font-mono text-[11px] text-ink-ghost">
+                                No card required · Cancel anytime · 30-day refund
+                            </p>
+                        </div>
+                    </SpotlightCard>
+                </Reveal>
+            </Section>
+
             <Footer />
+        </PageShell>
+    );
+}
+
+/** Shown when an API returns nothing, so the section never collapses silently. */
+function EmptyRail() {
+    return (
+        <div className="mt-12 rounded-2xl border border-dashed border-hairline-strong px-6 py-14 text-center">
+            <p className="font-mono text-[11px] uppercase tracking-mono text-ink-ghost">No courses yet</p>
+            <p className="mt-2 text-sm text-ink-faint">Check back shortly — new tracks publish every month.</p>
         </div>
     );
 }
-
-function CourseCard({ course }) {
-    const avgRating = course.reviews?.reduce((sum, r) => sum + r.rating, 0) / (course.reviews?.length || 1) || 0;
-
-    return (
-        <Link href={`/courses/${course.slug}`}>
-            <div className="group bg-slate-800 border border-slate-700 rounded-xl overflow-hidden hover:border-blue-500 transition-all duration-300 cursor-pointer h-full flex flex-col">
-                <div className="relative h-40 bg-gradient-to-br from-blue-500 to-purple-600 overflow-hidden">
-                    {course.thumbnail_url && (
-                        <img
-                            src={course.thumbnail_url && (course.thumbnail_url.startsWith('http') || course.thumbnail_url.startsWith('/storage/')) ? course.thumbnail_url : `/storage/${course.thumbnail_url}`}
-                            alt={course.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                        />
-                    )}
-                    <div className="absolute top-3 right-3 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                        {course.level}
-                    </div>
-                </div>
-
-                <div className="p-4 flex-1 flex flex-col">
-                    <p className="text-xs text-blue-400 font-semibold mb-2 uppercase">{course.category}</p>
-                    <h3 className="text-lg font-bold text-white mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
-                        {course.title}
-                    </h3>
-
-                    <p className="text-sm text-slate-400 mb-4 line-clamp-2 flex-1">
-                        {course.description}
-                    </p>
-
-                    <div className="flex items-center justify-between text-sm text-slate-400 mb-4 border-t border-slate-700 pt-4">
-                        <div className="flex items-center gap-1">
-                            <Users size={16} />
-                            <span>{course.enrollments_count} enrolled</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                            <Clock size={16} />
-                            <span>{course.total_duration} min</span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1">
-                            {[...Array(5)].map((_, i) => (
-                                <Star 
-                                    key={i}
-                                    size={16} 
-                                    className={i < Math.floor(avgRating) ? "fill-yellow-400 text-yellow-400" : "text-slate-600"}
-                                />
-                            ))}
-                            <span className="text-xs text-slate-400 ml-1">{avgRating.toFixed(1)}</span>
-                        </div>
-                        <span className="text-lg font-bold text-white">${course.price}</span>
-                    </div>
-                </div>
-            </div>
-        </Link>
-    );
-}
-

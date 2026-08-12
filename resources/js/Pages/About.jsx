@@ -1,463 +1,313 @@
 import React from 'react';
-import { Link } from '@inertiajs/react';
-import Navbar from '@/Components/Navbar';
-import { Head } from '@inertiajs/react';
-import Footer from '@/Components/Footer';
-import { 
-    GraduationCap, 
-    Target, 
-    Users, 
-    Award, 
-    TrendingUp, 
-    Globe, 
-    CheckCircle2,
-    Sparkles,
-    BookOpen,
-    Code,
-    Briefcase,
-    Heart
+import { Link, Head } from '@inertiajs/react';
+import {
+    Target, Users, BookOpen, TrendingUp, CheckCircle2,
+    Terminal as TerminalIcon, Award, ArrowRight, Layers,
 } from 'lucide-react';
 
+import Navbar from '@/Components/Navbar';
+import Footer from '@/Components/Footer';
+import Reveal from '@/Components/ui/Reveal';
+import SpotlightCard from '@/Components/ui/SpotlightCard';
+import CountUp from '@/Components/ui/CountUp';
+import { PageShell, Aurora, GridBackdrop, Section, SectionHeading } from '@/Components/ui/Backdrop';
+
+const VALUES = [
+    {
+        icon: Target,
+        title: 'Depth over breadth',
+        body: 'We would rather ship four tracks that take you to production ownership than forty that stop at "hello world".',
+        accent: '34,211,238',
+    },
+    {
+        icon: TerminalIcon,
+        title: 'Systems, not slides',
+        body: 'Every concept is taught against a live instance. If you cannot run it, we have not finished teaching it.',
+        accent: '139,124,255',
+    },
+    {
+        icon: TrendingUp,
+        title: 'Current by default',
+        body: 'Courses track upstream releases. Material that no longer reflects the product gets rewritten, not patched.',
+        accent: '34,211,238',
+    },
+    {
+        icon: Users,
+        title: 'Taught by operators',
+        body: 'Instructors are people who run these systems for a living, not full-time course producers.',
+        accent: '139,124,255',
+    },
+];
+
+const COMMITMENTS = [
+    'Industry-relevant curriculum, revised as upstream products change',
+    'Sequenced learning paths for every skill level',
+    'Real-world projects and production-shaped case studies',
+    'Lifetime access to everything you enrol in',
+    'Direct support from the people who wrote the material',
+];
+
 export default function About({ auth, team: teamFromProps = [], studentCount = 0, courseCount = 0 }) {
-    // Format student count nicely
-    const formatCount = (count) => {
-        if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M+`;
-        if (count >= 1000) return `${Math.floor(count / 1000)}k+`;
-        return `${count}+`;
-    };
-
-    const studentDisplay = studentCount > 0 ? formatCount(studentCount) : '50,000+';
-    const courseDisplay = courseCount > 0 ? formatCount(courseCount) : '500+';
-
-    const stats = [
-        { icon: Users, value: studentDisplay, label: 'Active Students', color: 'from-blue-500 to-blue-600' },
-        { icon: BookOpen, value: courseDisplay, label: 'Courses Available', color: 'from-purple-500 to-purple-600' },
-        { icon: Award, value: '98%', label: 'Success Rate', color: 'from-green-500 to-green-600' },
-        { icon: Globe, value: '150+', label: 'Countries Reached', color: 'from-orange-500 to-orange-600' }
-    ];
-
-    const values = [
-        {
-            icon: Target,
-            title: 'Mission-Driven',
-            description: 'We believe in making quality tech education accessible to everyone, everywhere.',
-            gradient: 'from-blue-500 to-cyan-500'
-        },
-        {
-            icon: Sparkles,
-            title: 'Excellence',
-            description: 'Every course is crafted by industry experts with real-world experience.',
-            gradient: 'from-purple-500 to-pink-500'
-        },
-        {
-            icon: Heart,
-            title: 'Student-Centric',
-            description: 'Your success is our success. We provide personalized learning paths and support.',
-            gradient: 'from-red-500 to-orange-500'
-        },
-        {
-            icon: TrendingUp,
-            title: 'Innovation',
-            description: 'We stay ahead of tech trends to bring you cutting-edge skills and knowledge.',
-            gradient: 'from-green-500 to-teal-500'
-        }
-    ];
-
-    const gradients = [
-        'from-blue-500 to-purple-600',
-        'from-purple-500 to-pink-600',
-        'from-green-500 to-teal-600',
-        'from-orange-500 to-red-600',
-    ];
-
-    const team = (teamFromProps.length ? teamFromProps : [
-        {
-            name: 'Mokom Nelvis Fon',
-            role: 'Founder',
-            expertise: 'Oracle Database Administrator',
-            avatar_url: null,
-        },
-    ]).map((member, index) => ({
-        ...member,
-        gradient: member.gradient ?? gradients[index % gradients.length],
-    }));
-
-    const milestones = [
-        { year: '2025', event: 'NelnadoSolutions Founded', description: 'Started with a vision to democratize tech education and empower professionals worldwide' },
-        { year: '2025', event: `${studentDisplay} Active Learners`, description: 'Rapidly growing community of tech professionals transforming their careers' }
-    ];
+    const team = teamFromProps.length
+        ? teamFromProps
+        : [
+              {
+                  name: 'Mokom Nelvis Fon',
+                  role: 'Founder',
+                  expertise: 'Oracle Database Administrator',
+                  avatar_url: null,
+              },
+          ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <PageShell>
             <Head>
                 <title>About NelnadoSolutions — Mission, Values, Founder</title>
-                <meta
-                    name="description"
-                    content="NelnadoSolutions empowers tech professionals through world-class learning experiences. Meet our founder and learn our mission and values."
-                />
+                <meta name="description" content="NelnadoSolutions empowers tech professionals through world-class learning experiences. Meet our founder and learn our mission and values." />
                 <link rel="canonical" href="/about" />
-                <meta
-                    property="og:title"
-                    content="About NelnadoSolutions — Mission, Values, Founder"
-                />
-                <meta
-                    property="og:description"
-                    content="Empowering tech professionals through expert instruction and hands-on learning."
-                />
+                <meta property="og:title" content="About NelnadoSolutions — Mission, Values, Founder" />
+                <meta property="og:description" content="Empowering tech professionals through expert instruction and hands-on learning." />
                 <meta property="og:type" content="website" />
                 <meta property="og:url" content="/about" />
                 <meta name="twitter:card" content="summary" />
-                <meta
-                    name="twitter:title"
-                    content="About NelnadoSolutions — Mission, Values, Founder"
-                />
-                <meta
-                    name="twitter:description"
-                    content="Empowering tech professionals through expert instruction and hands-on learning."
-                />
+                <meta name="twitter:title" content="About NelnadoSolutions — Mission, Values, Founder" />
+                <meta name="twitter:description" content="Empowering tech professionals through expert instruction and hands-on learning." />
             </Head>
-            <Navbar auth={auth} />
 
-            {/* Hero Section */}
-            <section className="relative overflow-hidden px-4 sm:px-6 lg:px-8 pt-32 pb-20">
-                <div className="absolute inset-0">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl" />
-                    <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse" />
-                    <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
-                </div>
+            <Navbar auth={auth} startSolid />
 
-                <div className="relative max-w-7xl mx-auto">
-                    <div className="text-center max-w-4xl mx-auto">
-                        <div className="inline-flex items-center space-x-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-2 mb-8">
-                            <Sparkles className="w-4 h-4 text-blue-400" />
-                            <span className="text-blue-400 text-sm font-medium">
-                                Empowering Tech Professionals Since 2025
-                            </span>
-                        </div>
+            {/* ===================== HERO ===================== */}
+            <section className="relative overflow-hidden pb-20 pt-32 sm:pt-40">
+                <Aurora />
+                <GridBackdrop />
 
-                        <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                            We're Building the
-                            <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                                Future of Learning
-                            </span>
+                <div className="relative mx-auto max-w-4xl px-5 text-center sm:px-8">
+                    <Reveal>
+                        <span className="chip-flux">
+                            <span className="h-1 w-1 rounded-full bg-flux" />
+                            Founded 2025
+                        </span>
+                    </Reveal>
+
+                    <Reveal delay={80}>
+                        <h1 className="mt-7 font-display text-[2.75rem] font-semibold leading-[1.03] tracking-tightest text-ink sm:text-[4rem]">
+                            Training built by people
+                            <br />
+                            who <span className="text-gradient">run the systems.</span>
                         </h1>
+                    </Reveal>
 
-                        <p className="text-xl text-slate-300 mb-12 leading-relaxed">
-                            NelnadoSolutions is more than a learning
-                            platform—it's a community of passionate
-                            technologists, industry experts, and lifelong
-                            learners committed to excellence and innovation.
+                    <Reveal delay={160}>
+                        <p className="mx-auto mt-7 max-w-2xl text-[17px] leading-relaxed text-ink-dim">
+                            NelnadoSolutions exists because most database training stops exactly where
+                            the hard part begins. We teach the operational depth that only shows up
+                            once a system is under real load.
                         </p>
+                    </Reveal>
 
-                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Link
-                                href="/courses"
-                                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/50 transition-all duration-300"
-                            >
-                                Explore Our Courses
+                    <Reveal delay={240}>
+                        <div className="mt-10 flex flex-wrap justify-center gap-3">
+                            <Link href="/courses" className="btn-flux group">
+                                Explore courses
+                                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
                             </Link>
-                            <Link
-                                href="/instructors"
-                                className="px-8 py-4 border-2 border-slate-400 text-slate-300 font-semibold rounded-lg hover:border-white hover:text-white transition-colors"
-                            >
-                                Meet Our Instructors
-                            </Link>
+                            <Link href="/instructors" className="btn-ghost">Meet the instructors</Link>
                         </div>
-                    </div>
+                    </Reveal>
                 </div>
             </section>
 
-            {/* Stats Section */}
-            <section className="hidden md:block px-4 sm:px-6 lg:px-8 py-20">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {stats.map((stat, index) => (
-                            <div key={index} className="relative group">
-                                <div className="absolute inset-0 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl blur-xl from-blue-500/50 to-purple-500/50" />
-                                <div className="relative bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 hover:border-slate-600 transition-all duration-300">
-                                    <div
-                                        className={`inline-flex p-3 bg-gradient-to-r ${stat.color} rounded-lg mb-4`}
-                                    >
-                                        <stat.icon className="w-6 h-6 text-white" />
+            {/* ===================== STATS ===================== */}
+            <Section className="pb-20">
+                <div className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-hairline bg-white/[0.04]">
+                    {[
+                        { icon: BookOpen, value: courseCount, label: 'Courses published' },
+                        { icon: Users, value: studentCount, label: 'Registered learners' },
+                        { icon: Layers, value: team.length, label: 'Team members' },
+                    ].map((stat, i) => {
+                        const Icon = stat.icon;
+                        return (
+                            <Reveal key={stat.label} delay={i * 90} className="bg-void">
+                                <div className="group h-full px-4 py-8 text-center transition-colors duration-500 hover:bg-white/[0.02] sm:px-6">
+                                    <Icon className="mx-auto mb-4 h-4 w-4 text-flux/70" />
+                                    <div className="font-display text-3xl font-semibold tracking-tightest text-ink sm:text-4xl">
+                                        <CountUp to={Number(stat.value) || 0} />
                                     </div>
-                                    <div className="text-4xl font-bold text-white mb-2">
-                                        {stat.value}
-                                    </div>
-                                    <div className="text-slate-400 font-medium">
+                                    <p className="mt-2 font-mono text-[10px] uppercase tracking-mono text-ink-ghost">
                                         {stat.label}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Mission Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-12 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5" />
-
-                <div className="relative max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        <div>
-                            <h2 className="text-4xl font-bold text-white mb-6">
-                                Our Mission
-                            </h2>
-                            <p className="text-lg text-slate-300 mb-6 leading-relaxed">
-                                At NelnadoSolutions, we're on a mission to
-                                democratize technology education and empower
-                                individuals to achieve their career goals
-                                through world-class learning experiences.
-                            </p>
-                            <p className="text-lg text-slate-300 mb-8 leading-relaxed">
-                                We believe that everyone deserves access to
-                                quality tech education, regardless of their
-                                background or location. That's why we've built a
-                                platform that combines expert instruction,
-                                hands-on projects, and career support.
-                            </p>
-
-                            <div className="space-y-4">
-                                {[
-                                    "Industry-relevant curriculum updated regularly",
-                                    "Personalized learning paths for every skill level",
-                                    "Real-world projects and case studies",
-                                    "Lifetime access to course materials",
-                                    "Community support and networking",
-                                ].map((item, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex items-center space-x-3"
-                                    >
-                                        <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
-                                        <span className="text-slate-300">
-                                            {item}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur-3xl opacity-20" />
-                            <div className="relative bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8">
-                                <div className="grid grid-cols-2 gap-6">
-                                    {[
-                                        {
-                                            icon: Code,
-                                            label: "Hands-on Learning",
-                                        },
-                                        {
-                                            icon: Briefcase,
-                                            label: "Career Support",
-                                        },
-                                        {
-                                            icon: Award,
-                                            label: "Certifications",
-                                        },
-                                        {
-                                            icon: Users,
-                                            label: "Expert Mentors",
-                                        },
-                                    ].map((item, index) => (
-                                        <div
-                                            key={index}
-                                            className="text-center"
-                                        >
-                                            <div className="inline-flex p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl mb-3">
-                                                <item.icon className="w-8 h-8 text-blue-400" />
-                                            </div>
-                                            <p className="text-white font-medium">
-                                                {item.label}
-                                            </p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Values Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-20">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-white mb-4">
-                            Our Core Values
-                        </h2>
-                        <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-                            The principles that guide everything we do
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {values.map((value, index) => (
-                            <div key={index} className="group relative">
-                                <div
-                                    className={`absolute inset-0 bg-gradient-to-r ${value.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-300 rounded-2xl blur-xl`}
-                                />
-                                <div className="relative bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 hover:border-slate-600 transition-all duration-300 h-full">
-                                    <div
-                                        className={`inline-flex p-3 bg-gradient-to-r ${value.gradient} rounded-lg mb-4`}
-                                    >
-                                        <value.icon className="w-6 h-6 text-white" />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-white mb-3">
-                                        {value.title}
-                                    </h3>
-                                    <p className="text-slate-400 leading-relaxed">
-                                        {value.description}
                                     </p>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            </Reveal>
+                        );
+                    })}
                 </div>
-            </section>
+            </Section>
 
-            {/* Team Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-20 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5" />
-
-                <div className="relative max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-white mb-4">
-                            Meet Our Team
-                        </h2>
-                        <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-                            Learn from industry veterans with years of
-                            real-world experience
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                        {team.map((member, index) => (
-                            <div
-                                key={index}
-                                className="group text-center bg-slate-800/70 border border-slate-700 rounded-2xl p-8 shadow-xl hover:border-blue-500/60 hover:shadow-blue-500/20 hover:-translate-y-2 transition-all duration-300"
-                            >
-                                <div className="relative mb-6 inline-block">
-                                    <div
-                                        className={`absolute inset-0 bg-gradient-to-r ${member.gradient} rounded-2xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity`}
-                                    />
-                                    <div
-                                        className={`relative w-40 h-40 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex items-center justify-center mx-auto shadow-2xl ring-2 ring-white/5 group-hover:ring-blue-500/40 transition-all`}
-                                    >
-                                        {member.avatar_url ? (
-                                            <img
-                                                src={
-                                                    member.avatar_url.startsWith(
-                                                        "http"
-                                                    )
-                                                        ? member.avatar_url
-                                                        : `/storage/${member.avatar_url}`
-                                                }
-                                                alt={member.name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <span className="text-3xl font-bold text-white">
-                                                {(member.name || "?")
-                                                    .split(" ")
-                                                    .map((n) => n[0])
-                                                    .join("")
-                                                    .slice(0, 2)}
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-2">
-                                    {member.name}
-                                </h3>
-                                <p className="text-blue-400 font-semibold mb-2 uppercase tracking-wide">
-                                    {member.role}
-                                </p>
-                                <p className="text-slate-300 text-sm">
-                                    {member.expertise}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Timeline Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-20">
-                <div className="max-w-4xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl font-bold text-white mb-4">
-                            Our Journey
-                        </h2>
-                        <p className="text-xl text-slate-400">
-                            From a small startup to a global learning platform
-                        </p>
-                    </div>
-
-                    <div className="relative">
-                        {/* Timeline line */}
-                        <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500 via-purple-500 to-pink-500" />
-
-                        <div className="space-y-12">
-                            {milestones.map((milestone, index) => (
-                                <div key={index} className="relative pl-20">
-                                    {/* Timeline dot */}
-                                    <div className="absolute left-6 top-2 w-5 h-5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full border-4 border-slate-900" />
-
-                                    <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition-colors">
-                                        <div className="flex items-center space-x-4 mb-2">
-                                            <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                                                {milestone.year}
-                                            </span>
-                                            <h3 className="text-xl font-bold text-white">
-                                                {milestone.event}
-                                            </h3>
-                                        </div>
-                                        <p className="text-slate-400">
-                                            {milestone.description}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
+            {/* ===================== MISSION ===================== */}
+            <Section className="py-16 lg:py-24">
+                <div className="grid items-start gap-14 lg:grid-cols-2 lg:gap-20">
+                    <Reveal>
+                        <div className="mb-4 flex items-center gap-2.5">
+                            <span className="h-px w-6 bg-flux/50" />
+                            <span className="eyebrow">Our mission</span>
                         </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section className="px-4 sm:px-6 lg:px-8 py-20">
-                <div className="max-w-7xl mx-auto">
-                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl p-12 md:p-16">
-                        <div className="absolute inset-0 bg-black/20" />
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl" />
-
-                        <div className="relative text-center max-w-3xl mx-auto">
-                            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                                Ready to Start Your Learning Journey?
-                            </h2>
-                            <p className="text-xl text-white/90 mb-8">
-                                Join thousands of students who are already
-                                transforming their careers with NelnadoSolutions
+                        <h2 className="font-display text-3xl font-semibold tracking-tightest text-ink sm:text-[2.5rem]">
+                            Make operational depth learnable.
+                        </h2>
+                        <div className="mt-6 space-y-5 text-[15px] leading-relaxed text-ink-dim">
+                            <p>
+                                Plenty of courses will teach you to write a <code className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[13px] text-flux">SELECT</code>.
+                                Very few will show you what happens when that query meets a hundred
+                                million rows, a bad index, and an impatient application.
                             </p>
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                                <Link
-                                    href="/courses"
-                                    className="px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-slate-100 transition-colors"
-                                >
-                                    Browse Courses
-                                </Link>
-                                <Link
-                                    href="/register"
-                                    className="px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white/10 transition-colors"
-                                >
-                                    Sign Up Free
-                                </Link>
-                            </div>
+                            <p>
+                                We build training for that second situation — the one you actually get
+                                paid for. Quality education should not depend on which company happens
+                                to employ you, so everything here is designed to be learned from scratch,
+                                from anywhere.
+                            </p>
                         </div>
+                    </Reveal>
+
+                    <Reveal delay={140}>
+                        <SpotlightCard className="panel rounded-2xl p-8">
+                            <h3 className="font-mono text-[10px] uppercase tracking-mono text-ink-ghost">
+                                What we commit to
+                            </h3>
+                            <ul className="mt-6 space-y-4">
+                                {COMMITMENTS.map((item) => (
+                                    <li key={item} className="flex items-start gap-3">
+                                        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-flux" />
+                                        <span className="text-sm leading-relaxed text-ink-dim">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </SpotlightCard>
+                    </Reveal>
+                </div>
+            </Section>
+
+            {/* ===================== VALUES ===================== */}
+            <section className="relative overflow-hidden border-y border-hairline bg-void-50/30 py-20 lg:py-28">
+                <Aurora variant="quiet" />
+                <div className="relative mx-auto max-w-7xl px-5 sm:px-8">
+                    <Reveal>
+                        <SectionHeading
+                            eyebrow="Principles"
+                            title="What we optimise for"
+                            lede="Four decisions that shape everything we publish."
+                            align="center"
+                        />
+                    </Reveal>
+
+                    <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                        {VALUES.map((value, i) => {
+                            const Icon = value.icon;
+                            return (
+                                <Reveal key={value.title} delay={i * 90}>
+                                    <SpotlightCard
+                                        spotlightColor={value.accent}
+                                        className="panel panel-hover h-full rounded-2xl p-7"
+                                    >
+                                        <span
+                                            className="mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl border"
+                                            style={{
+                                                borderColor: `rgba(${value.accent},0.25)`,
+                                                background: `radial-gradient(circle at 30% 25%, rgba(${value.accent},0.22), rgba(${value.accent},0.04))`,
+                                            }}
+                                        >
+                                            <Icon className="h-5 w-5" style={{ color: `rgb(${value.accent})` }} />
+                                        </span>
+                                        <h3 className="font-display text-lg font-semibold tracking-tighter text-ink">
+                                            {value.title}
+                                        </h3>
+                                        <p className="mt-2.5 text-sm leading-relaxed text-ink-faint">{value.body}</p>
+                                    </SpotlightCard>
+                                </Reveal>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
+
+            {/* ===================== TEAM ===================== */}
+            <Section className="py-20 lg:py-28">
+                <Reveal>
+                    <SectionHeading
+                        eyebrow="The team"
+                        title="Who you'll learn from"
+                        lede="Practitioners first, instructors second."
+                        align="center"
+                    />
+                </Reveal>
+
+                <div className="mx-auto mt-14 grid max-w-4xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {team.map((member, i) => (
+                        <Reveal key={member.name || i} delay={i * 100}>
+                            <SpotlightCard className="panel panel-hover h-full rounded-2xl p-7 text-center">
+                                <div className="mx-auto mb-5 h-24 w-24 overflow-hidden rounded-2xl border border-hairline">
+                                    {member.avatar_url ? (
+                                        <img
+                                            src={member.avatar_url.startsWith('http') ? member.avatar_url : `/storage/${member.avatar_url}`}
+                                            alt={member.name}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <span
+                                            className="flex h-full w-full items-center justify-center font-display text-2xl font-semibold text-flux"
+                                            style={{ background: 'radial-gradient(circle at 30% 25%, rgba(34,211,238,0.22), rgba(34,211,238,0.03))' }}
+                                        >
+                                            {(member.name || '?').split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                                        </span>
+                                    )}
+                                </div>
+
+                                <h3 className="font-display text-lg font-semibold tracking-tighter text-ink">{member.name}</h3>
+                                <p className="mt-1 font-mono text-[10px] uppercase tracking-mono text-flux">{member.role}</p>
+                                {member.expertise && (
+                                    <p className="mt-3 text-[13px] leading-relaxed text-ink-faint">{member.expertise}</p>
+                                )}
+                            </SpotlightCard>
+                        </Reveal>
+                    ))}
+                </div>
+            </Section>
+
+            {/* ===================== CTA ===================== */}
+            <Section className="pb-28">
+                <Reveal>
+                    <SpotlightCard
+                        radius={620}
+                        intensity={0.12}
+                        className="relative overflow-hidden rounded-3xl border border-hairline-strong bg-void-100 px-6 py-20 text-center sm:px-16"
+                    >
+                        <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-grid-sm opacity-50 mask-radial" />
+                        <div
+                            aria-hidden="true"
+                            className="pointer-events-none absolute inset-x-0 -bottom-40 h-80 blur-3xl"
+                            style={{ background: 'radial-gradient(closest-side, rgba(34,211,238,0.26), transparent 70%)' }}
+                        />
+                        <div className="relative mx-auto max-w-2xl">
+                            <Award className="mx-auto mb-6 h-6 w-6 text-flux" />
+                            <h2 className="font-display text-[2rem] font-semibold leading-[1.06] tracking-tightest text-ink sm:text-[2.75rem]">
+                                Ready to go deeper?
+                            </h2>
+                            <p className="mx-auto mt-5 max-w-lg text-[15px] leading-relaxed text-ink-dim">
+                                Start with any track. Everything you enrol in stays yours for good.
+                            </p>
+                            <div className="mt-9 flex flex-wrap justify-center gap-3">
+                                <Link href="/courses" className="btn-flux group">
+                                    Browse courses
+                                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                                </Link>
+                                <Link href="/register" className="btn-ghost">Create free account</Link>
+                            </div>
+                        </div>
+                    </SpotlightCard>
+                </Reveal>
+            </Section>
+
             <Footer />
-        </div>
+        </PageShell>
     );
 }

@@ -2,34 +2,309 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   BASE
+   ============================================================ */
+@layer base {
+    :root {
+        --void: #05070a;
+        --flux: 34 211 238;
+        --pulse: 139 124 255;
+        --hairline: rgba(148, 163, 184, 0.1);
+        --hairline-strong: rgba(148, 163, 184, 0.2);
+    }
+
+    html {
+        scroll-behavior: smooth;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        @apply bg-void text-ink font-sans antialiased;
+        font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
+        text-rendering: optimizeLegibility;
+        overflow-x: hidden;
+    }
+
+    /* Display type is optically tighter than body type. */
+    h1,
+    h2,
+    h3 {
+        @apply font-display tracking-tighter;
+        text-wrap: balance;
+    }
+
+    p {
+        text-wrap: pretty;
+    }
+
+    ::selection {
+        background: rgb(var(--flux) / 0.28);
+        color: #fff;
+    }
+
+    /* Scrollbar reads as part of the chrome, not the OS. */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #05070a;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #1c2531;
+        border-radius: 99px;
+        border: 2px solid #05070a;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #2b3644;
+    }
+
+    /* Focus ring: one consistent treatment everywhere. */
+    :focus-visible {
+        outline: 2px solid rgb(var(--flux) / 0.7);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    /* Native selects need explicit dark styling for their popup list. */
+    select option {
+        background: #0d1118;
+        color: #e8eef6;
+    }
+}
+
+/* ============================================================
+   TEXTURE — grain + grid. These are what separate a rendered
+   surface from a flat fill.
+   ============================================================ */
 @layer utilities {
-    .animate-fadeIn {
-        animation: fadeIn 0.3s ease-in-out;
+    /* Film grain overlay. Applied once at the app root. */
+    .texture-grain::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.035;
+        mix-blend-mode: overlay;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 260 260' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     }
 
-    .animate-slideDown {
-        animation: slideDown 0.3s ease-out;
+    /* Engineering grid. */
+    .bg-grid {
+        background-image: linear-gradient(var(--hairline) 1px, transparent 1px),
+            linear-gradient(90deg, var(--hairline) 1px, transparent 1px);
+        background-size: 64px 64px;
+    }
+    .bg-grid-sm {
+        background-image: linear-gradient(var(--hairline) 1px, transparent 1px),
+            linear-gradient(90deg, var(--hairline) 1px, transparent 1px);
+        background-size: 28px 28px;
+    }
+    .bg-dots {
+        background-image: radial-gradient(rgba(148, 163, 184, 0.18) 1px, transparent 1px);
+        background-size: 22px 22px;
     }
 
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    /* Fade a texture out toward the bottom so it never hits a hard edge. */
+    .mask-fade-b {
+        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 100%);
+        mask-image: linear-gradient(to bottom, #000 0%, #000 45%, transparent 100%);
+    }
+    .mask-fade-y {
+        -webkit-mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+        mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+    }
+    .mask-fade-x {
+        -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+        mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+    }
+    .mask-radial {
+        -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, #000 40%, transparent 100%);
+        mask-image: radial-gradient(ellipse 60% 55% at 50% 40%, #000 40%, transparent 100%);
     }
 
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
+    /* Gradient text — reserved for the single hero accent phrase. */
+    .text-gradient {
+        @apply bg-clip-text text-transparent;
+        background-image: linear-gradient(100deg, #e8eef6 8%, #67e8f9 42%, #8b7cff 78%, #e8eef6 100%);
+    }
+    .text-gradient-flux {
+        @apply bg-clip-text text-transparent;
+        background-image: linear-gradient(100deg, #67e8f9, #22d3ee 45%, #8b7cff);
+    }
+
+    .writing-vertical {
+        writing-mode: vertical-rl;
+    }
+
+    /* Respect users who ask for less motion. */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    }
+}
+
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
+@layer components {
+    /* --- Surfaces -------------------------------------------------- */
+
+    /* Base panel: hairline border + inner top highlight = lit from above. */
+    .panel {
+        @apply relative rounded-2xl border border-hairline bg-void-100/70 backdrop-blur-xl;
+        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset, 0 20px 48px -24px rgba(0, 0, 0, 0.9);
+    }
+
+    .panel-hover {
+        @apply transition-all duration-500 ease-out;
+    }
+    .panel-hover:hover {
+        @apply border-hairline-strong -translate-y-1;
+        box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08) inset, 0 32px 64px -28px rgba(0, 0, 0, 0.95);
+    }
+
+    /* Glass chrome for the fixed nav. */
+    .glass {
+        @apply border-hairline bg-void/70 backdrop-blur-2xl backdrop-saturate-150;
+    }
+
+    /* --- Eyebrow / mono label -------------------------------------- */
+    .eyebrow {
+        @apply font-mono text-eyebrow uppercase text-flux;
+    }
+    .eyebrow-dim {
+        @apply font-mono text-eyebrow uppercase text-ink-faint;
+    }
+
+    /* --- Buttons ---------------------------------------------------- */
+    .btn {
+        @apply relative inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3
+               font-medium text-sm whitespace-nowrap transition-all duration-300 ease-out
+               disabled:pointer-events-none disabled:opacity-50;
+    }
+
+    /* Primary: solid light on dark. Highest contrast = highest priority. */
+    .btn-primary {
+        @apply btn bg-ink text-void hover:bg-white;
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 8px 24px -8px rgba(232, 238, 246, 0.35);
+    }
+    .btn-primary:hover {
+        box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 12px 32px -8px rgba(232, 238, 246, 0.5);
+        transform: translateY(-1px);
+    }
+
+    /* Accent: the cyan one. Use once per view. */
+    .btn-flux {
+        @apply btn text-void;
+        background: linear-gradient(180deg, #67e8f9, #22d3ee);
+        box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.3), 0 8px 28px -8px rgba(34, 211, 238, 0.6);
+    }
+    .btn-flux:hover {
+        box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.45), 0 14px 40px -8px rgba(34, 211, 238, 0.8);
+        transform: translateY(-1px);
+    }
+
+    /* Secondary: hairline ghost. */
+    .btn-ghost {
+        @apply btn border border-hairline-strong text-ink hover:bg-white/[0.04];
+    }
+    .btn-ghost:hover {
+        @apply border-flux/40;
+        transform: translateY(-1px);
+    }
+
+    .btn-quiet {
+        @apply btn text-ink-dim hover:text-ink hover:bg-white/[0.05];
+    }
+
+    /* --- Form controls ---------------------------------------------- */
+    .field {
+        @apply w-full rounded-xl border border-hairline bg-void-200/60 px-4 py-3
+               text-sm text-ink placeholder:text-ink-ghost
+               transition-all duration-300 ease-out
+               focus:border-flux/50 focus:bg-void-200 focus:outline-none focus:ring-0;
+    }
+    .field:focus {
+        box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.12);
+    }
+
+    /* --- Chips / badges --------------------------------------------- */
+    .chip {
+        @apply inline-flex items-center gap-1.5 rounded-full border border-hairline
+               bg-white/[0.03] px-3 py-1 font-mono text-[10px] uppercase tracking-mono text-ink-dim;
+    }
+    .chip-flux {
+        @apply chip border-flux/25 bg-flux/10 text-flux;
+    }
+    .chip-pulse {
+        @apply chip border-pulse/25 bg-pulse/10 text-pulse-soft;
+    }
+
+    /* --- Hairline divider with a lit center ------------------------- */
+    .rule {
+        height: 1px;
+        border: 0;
+        background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.24), transparent);
+    }
+    .rule-flux {
+        height: 1px;
+        border: 0;
+        background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.5), transparent);
+    }
+
+    /* --- Animated gradient border ----------------------------------- */
+    .border-beam {
+        position: relative;
+        isolation: isolate;
+    }
+    .border-beam::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: linear-gradient(120deg, transparent 25%, rgba(34, 211, 238, 0.7), rgba(139, 124, 255, 0.7), transparent 75%);
+        background-size: 200% 100%;
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        animation: shimmer 3.5s linear infinite;
+        pointer-events: none;
+    }
+    .border-beam:hover::before {
+        opacity: 1;
+    }
+
+    /* --- Skeleton --------------------------------------------------- */
+    .skeleton {
+        @apply rounded-lg bg-void-300;
+        background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+        background-size: 200% 100%;
+        animation: shimmer 1.8s linear infinite;
+    }
+
+    /* --- Line clamp helpers already used across pages --------------- */
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 }

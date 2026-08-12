@@ -38,6 +38,15 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
         'testimonials' => $testimonials,
         'learnerCount' => $learnerCount,
+        // Real figures for the stats band, so the landing page is not quoting
+        // invented numbers back at visitors.
+        'stats' => [
+            'courses' => Course::count(),
+            'instructors' => User::where('role', 'instructor')->count(),
+            'avgRating' => round((float) Review::avg('rating'), 1),
+            'reviewCount' => Review::count(),
+            'chapters' => \App\Models\Chapter::count(),
+        ],
     ]);
 });
 
@@ -122,6 +131,29 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::get('/contact', function () {
     return Inertia::render('Contact');
 })->name('contact');
+
+// The contact form previously faked a success message client-side without
+// sending anything. This actually delivers it. With MAIL_MAILER=log (the
+// default in .env.example) the message lands in storage/logs/laravel.log —
+// set real mail credentials before relying on it in production.
+Route::post('/contact', function (Illuminate\Http\Request $request) {
+    $validated = $request->validate([
+        'name' => ['required', 'string', 'max:120'],
+        'email' => ['required', 'email', 'max:190'],
+        'subject' => ['required', 'string', 'max:180'],
+        'message' => ['required', 'string', 'max:5000'],
+    ]);
+
+    Illuminate\Support\Facades\Mail::raw(
+        "From: {$validated['name']} <{$validated['email']}>\n\n{$validated['message']}",
+        fn ($mail) => $mail
+            ->to(config('mail.from.address'))
+            ->replyTo($validated['email'], $validated['name'])
+            ->subject("[Contact] {$validated['subject']}")
+    );
+
+    return back()->with('success', 'Thanks — your message is on its way. We usually reply within one business day.');
+})->middleware('throttle:5,1')->name('contact.store');
 
 Route::get('/pricing', function () {
     return Inertia::render('Pricing');

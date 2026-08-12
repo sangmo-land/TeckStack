@@ -1,257 +1,242 @@
-import React, { useState } from 'react';
-import { Head } from '@inertiajs/react';
-import { Mail, Phone, MessageCircle, MapPin, Send, CheckCircle } from 'lucide-react';
+import React from 'react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { Mail, Phone, MessageCircle, Globe, Send, CheckCircle2, ArrowUpRight } from 'lucide-react';
+
 import Navbar from '@/Components/Navbar';
 import Footer from '@/Components/Footer';
+import Reveal from '@/Components/ui/Reveal';
+import SpotlightCard from '@/Components/ui/SpotlightCard';
+import Field from '@/Components/ui/Field';
+import { PageShell, Aurora, GridBackdrop, Section } from '@/Components/ui/Backdrop';
+
+const CHANNELS = [
+    {
+        icon: Mail,
+        label: 'Email',
+        blurb: 'Best for detailed questions',
+        value: 'mokomnelvis@yahoo.com',
+        href: 'mailto:mokomnelvis@yahoo.com',
+        accent: '34,211,238',
+    },
+    {
+        icon: Phone,
+        label: 'Phone',
+        blurb: 'During business hours',
+        value: '+1 (240) 906-0295',
+        href: 'tel:+12409060295',
+        accent: '163,230,53',
+    },
+    {
+        icon: MessageCircle,
+        label: 'WhatsApp',
+        blurb: 'Fastest for quick questions',
+        value: 'Start a chat',
+        href: 'https://wa.me/12409060295',
+        external: true,
+        accent: '139,124,255',
+    },
+    {
+        icon: Globe,
+        label: 'Coverage',
+        blurb: 'Fully remote platform',
+        value: 'Available worldwide',
+        accent: '148,163,184',
+    },
+];
 
 export default function Contact({ auth }) {
-    const [formData, setFormData] = useState({
+    const { flash } = usePage().props;
+
+    const { data, setData, post, processing, errors, reset, recentlySuccessful } = useForm({
         name: '',
         email: '',
         subject: '',
-        message: ''
+        message: '',
     });
-    const [status, setStatus] = useState(null);
 
-    const handleSubmit = (e) => {
+    const submit = (e) => {
         e.preventDefault();
-        // Simulate form submission
-        setStatus('success');
-        setTimeout(() => {
-            setStatus(null);
-            setFormData({ name: '', email: '', subject: '', message: '' });
-        }, 3000);
+        post(route('contact.store'), {
+            preserveScroll: true,
+            onSuccess: () => reset(),
+        });
     };
 
-    const handleChange = (e) => {
-        setFormData(prev => ({
-            ...prev,
-            [e.target.name]: e.target.value
-        }));
-    };
+    const sent = recentlySuccessful || Boolean(flash?.success);
 
     return (
-        <>
-            <Head title="Contact Us" />
-            <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-                <Navbar auth={auth} />
-                
-                {/* Hero Section */}
-                <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10" />
-                    <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
-                    <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-                    
-                    <div className="relative max-w-7xl mx-auto text-center">
-                        <h1 className="text-5xl lg:text-6xl font-extrabold text-white mb-6">
-                            Get In <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Touch</span>
+        <PageShell>
+            <Head title="Contact" />
+            <Navbar auth={auth} startSolid />
+
+            {/* ===================== HERO ===================== */}
+            <section className="relative overflow-hidden pb-14 pt-32 sm:pt-40">
+                <Aurora />
+                <GridBackdrop />
+
+                <div className="relative mx-auto max-w-3xl px-5 text-center sm:px-8">
+                    <Reveal>
+                        <div className="flex items-center justify-center gap-2.5">
+                            <span className="h-px w-6 bg-flux/50" />
+                            <span className="eyebrow">Contact</span>
+                        </div>
+                    </Reveal>
+                    <Reveal delay={80}>
+                        <h1 className="mt-5 font-display text-[2.5rem] font-semibold leading-[1.04] tracking-tightest text-ink sm:text-[3.5rem]">
+                            Talk to a <span className="text-gradient">real engineer.</span>
                         </h1>
-                        <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-                            Have questions about our courses? Need support? We're here to help you on your learning journey.
+                    </Reveal>
+                    <Reveal delay={160}>
+                        <p className="mx-auto mt-5 max-w-xl text-[16px] leading-relaxed text-ink-dim">
+                            Questions about a track, team pricing, or whether a course fits your stack —
+                            we answer these ourselves.
                         </p>
-                    </div>
-                </section>
+                    </Reveal>
+                </div>
+            </section>
 
-                {/* Contact Information & Form */}
-                <section className="px-4 sm:px-6 lg:px-8 pb-20">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            {/* Contact Cards */}
-                            <div className="space-y-6">
-                                {/* Email Card */}
-                                <div className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 hover:border-blue-500 transition-all duration-300">
-                                    <div className="flex items-start gap-4">
-                                        <div className="p-3 bg-blue-500/10 rounded-xl group-hover:bg-blue-500/20 transition-colors">
-                                            <Mail className="text-blue-400" size={24} />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-white mb-2">Email Us</h3>
-                                            <p className="text-slate-400 text-sm mb-3">Send us an email anytime</p>
-                                            <a 
-                                                href="mailto:mokomnelvis@yahoo.com" 
-                                                className="text-blue-400 hover:text-blue-300 font-medium text-sm break-all"
-                                            >
-                                                mokomnelvis@yahoo.com
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Phone Card */}
-                                <div className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 hover:border-green-500 transition-all duration-300">
-                                    <div className="flex items-start gap-4">
-                                        <div className="p-3 bg-green-500/10 rounded-xl group-hover:bg-green-500/20 transition-colors">
-                                            <Phone className="text-green-400" size={24} />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-white mb-2">Call Us</h3>
-                                            <p className="text-slate-400 text-sm mb-3">Available during business hours</p>
-                                            <a 
-                                                href="tel:+12409060295" 
-                                                className="text-green-400 hover:text-green-300 font-medium text-sm"
-                                            >
-                                                +1 (240) 906-0295
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* WhatsApp Card */}
-                                <div className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 hover:border-emerald-500 transition-all duration-300">
-                                    <div className="flex items-start gap-4">
-                                        <div className="p-3 bg-emerald-500/10 rounded-xl group-hover:bg-emerald-500/20 transition-colors">
-                                            <MessageCircle className="text-emerald-400" size={24} />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-white mb-2">WhatsApp</h3>
-                                            <p className="text-slate-400 text-sm mb-3">Message us instantly</p>
-                                            <a 
-                                                href="https://wa.me/12409060295" 
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-medium text-sm transition-colors"
-                                            >
-                                                <MessageCircle size={16} />
-                                                Chat on WhatsApp
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Location Card */}
-                                <div className="group bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-6 hover:border-purple-500 transition-all duration-300">
-                                    <div className="flex items-start gap-4">
-                                        <div className="p-3 bg-purple-500/10 rounded-xl group-hover:bg-purple-500/20 transition-colors">
-                                            <MapPin className="text-purple-400" size={24} />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-lg font-semibold text-white mb-2">Our Location</h3>
-                                            <p className="text-slate-400 text-sm">
-                                                Available worldwide through our online platform
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Contact Form */}
-                            <div className="lg:col-span-2">
-                                <div className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8">
-                                    <div className="mb-8">
-                                        <h2 className="text-3xl font-bold text-white mb-3">Send Us a Message</h2>
-                                        <p className="text-slate-400">
-                                            Fill out the form below and we'll get back to you as soon as possible.
-                                        </p>
-                                    </div>
-
-                                    {status === 'success' && (
-                                        <div className="mb-6 p-4 bg-green-500/10 border border-green-500/50 rounded-lg flex items-center gap-3">
-                                            <CheckCircle className="text-green-400" size={20} />
-                                            <p className="text-green-400 font-medium">Message sent successfully! We'll get back to you soon.</p>
-                                        </div>
-                                    )}
-
-                                    <form onSubmit={handleSubmit} className="space-y-6">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-300 mb-2">
-                                                    Your Name *
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    name="name"
-                                                    value={formData.name}
-                                                    onChange={handleChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                                                    placeholder="John Doe"
-                                                />
-                                            </div>
-
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-300 mb-2">
-                                                    Your Email *
-                                                </label>
-                                                <input
-                                                    type="email"
-                                                    name="email"
-                                                    value={formData.email}
-                                                    onChange={handleChange}
-                                                    required
-                                                    className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                                                    placeholder="john@example.com"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-300 mb-2">
-                                                Subject *
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="subject"
-                                                value={formData.subject}
-                                                onChange={handleChange}
-                                                required
-                                                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
-                                                placeholder="How can we help you?"
-                                            />
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-slate-300 mb-2">
-                                                Message *
-                                            </label>
-                                            <textarea
-                                                name="message"
-                                                value={formData.message}
-                                                onChange={handleChange}
-                                                required
-                                                rows="6"
-                                                className="w-full px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"
-                                                placeholder="Tell us more about your inquiry..."
-                                            />
-                                        </div>
-
-                                        <button
-                                            type="submit"
-                                            className="w-full md:w-auto px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
-                                        >
-                                            <Send size={20} />
-                                            Send Message
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* CTA Section */}
-                <section className="px-4 sm:px-6 lg:px-8 pb-20">
-                    <div className="max-w-4xl mx-auto">
-                        <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center">
-                            <div className="absolute inset-0 bg-black/20" />
-                            <div className="relative">
-                                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
-                                    Ready to Start Learning?
-                                </h2>
-                                <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-                                    Join thousands of students already learning with NelnadoSolutions and take your skills to the next level.
-                                </p>
-                                <a
-                                    href="/courses"
-                                    className="inline-block px-8 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-slate-100 transition-colors shadow-xl"
+            {/* ===================== BODY ===================== */}
+            <Section className="pb-24">
+                <div className="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
+                    {/* --- Channels --- */}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+                        {CHANNELS.map((c, i) => {
+                            const Icon = c.icon;
+                            const inner = (
+                                <SpotlightCard
+                                    spotlightColor={c.accent}
+                                    className="panel panel-hover h-full rounded-2xl p-5"
                                 >
-                                    Browse Courses
-                                </a>
-                            </div>
-                        </div>
+                                    <div className="flex items-start gap-4">
+                                        <span
+                                            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
+                                            style={{
+                                                borderColor: `rgba(${c.accent},0.25)`,
+                                                background: `radial-gradient(circle at 30% 25%, rgba(${c.accent},0.20), rgba(${c.accent},0.03))`,
+                                            }}
+                                        >
+                                            <Icon className="h-4 w-4" style={{ color: `rgb(${c.accent})` }} />
+                                        </span>
+
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex items-center gap-1.5">
+                                                <h3 className="font-mono text-[10px] uppercase tracking-mono text-ink-ghost">
+                                                    {c.label}
+                                                </h3>
+                                                {c.href && (
+                                                    <ArrowUpRight className="h-3 w-3 text-ink-ghost transition-all duration-300 group-hover/spot:-translate-y-0.5 group-hover/spot:translate-x-0.5 group-hover/spot:text-flux" />
+                                                )}
+                                            </div>
+                                            <p className="mt-1.5 break-words text-[14px] font-medium text-ink">{c.value}</p>
+                                            <p className="mt-0.5 text-[12px] text-ink-faint">{c.blurb}</p>
+                                        </div>
+                                    </div>
+                                </SpotlightCard>
+                            );
+
+                            return (
+                                <Reveal key={c.label} delay={i * 80}>
+                                    {c.href ? (
+                                        <a
+                                            href={c.href}
+                                            {...(c.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                                            className="block h-full"
+                                        >
+                                            {inner}
+                                        </a>
+                                    ) : (
+                                        inner
+                                    )}
+                                </Reveal>
+                            );
+                        })}
                     </div>
-                </section>
-                <Footer />
-            </div>
-        </>
+
+                    {/* --- Form --- */}
+                    <Reveal delay={140}>
+                        <SpotlightCard className="panel h-full rounded-2xl p-7 sm:p-9">
+                            <h2 className="font-display text-2xl font-semibold tracking-tightest text-ink">
+                                Send a message
+                            </h2>
+                            <p className="mt-2 text-[14px] text-ink-faint">
+                                We usually reply within one business day.
+                            </p>
+
+                            {sent && (
+                                <div className="mt-6 flex items-start gap-2.5 rounded-xl border border-signal/25 bg-signal/10 px-4 py-3">
+                                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-signal" />
+                                    <p className="text-[13px] leading-relaxed text-signal">
+                                        {flash?.success || 'Thanks — your message is on its way.'}
+                                    </p>
+                                </div>
+                            )}
+
+                            <form onSubmit={submit} className="mt-7 space-y-5">
+                                <div className="grid gap-5 sm:grid-cols-2">
+                                    <Field
+                                        id="name"
+                                        name="name"
+                                        label="Your name"
+                                        placeholder="Jane Okoro"
+                                        value={data.name}
+                                        onChange={(e) => setData('name', e.target.value)}
+                                        error={errors.name}
+                                        autoComplete="name"
+                                        required
+                                    />
+                                    <Field
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        label="Your email"
+                                        placeholder="jane@example.com"
+                                        value={data.email}
+                                        onChange={(e) => setData('email', e.target.value)}
+                                        error={errors.email}
+                                        autoComplete="email"
+                                        required
+                                    />
+                                </div>
+
+                                <Field
+                                    id="subject"
+                                    name="subject"
+                                    label="Subject"
+                                    placeholder="Which track suits a mid-level DBA?"
+                                    value={data.subject}
+                                    onChange={(e) => setData('subject', e.target.value)}
+                                    error={errors.subject}
+                                    required
+                                />
+
+                                <div>
+                                    <label htmlFor="message" className="mb-2 block text-[13px] font-medium text-ink-dim">
+                                        Message
+                                    </label>
+                                    <textarea
+                                        id="message"
+                                        name="message"
+                                        rows={6}
+                                        value={data.message}
+                                        onChange={(e) => setData('message', e.target.value)}
+                                        placeholder="Tell us a little about your background and what you're aiming for…"
+                                        className={`field resize-none ${errors.message ? '!border-alert/50' : ''}`}
+                                        required
+                                    />
+                                    {errors.message && <p className="mt-2 text-[13px] text-alert">{errors.message}</p>}
+                                </div>
+
+                                <button type="submit" disabled={processing} className="btn-flux group w-full sm:w-auto">
+                                    <Send className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                                    {processing ? 'Sending…' : 'Send message'}
+                                </button>
+                            </form>
+                        </SpotlightCard>
+                    </Reveal>
+                </div>
+            </Section>
+
+            <Footer />
+        </PageShell>
     );
 }
