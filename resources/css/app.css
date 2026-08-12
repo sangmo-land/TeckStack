@@ -345,6 +345,86 @@
         }
     }
 
+    /* --- Rich text (instructor-authored HTML) ------------------------
+       Typography for course overviews and any other stored markup, so it
+       inherits the design system instead of browser defaults.
+       ----------------------------------------------------------------- */
+    .prose-doc {
+        @apply text-[15px] leading-relaxed text-ink-dim;
+    }
+    .prose-doc > :first-child {
+        margin-top: 0;
+    }
+    .prose-doc > :last-child {
+        margin-bottom: 0;
+    }
+    .prose-doc p {
+        @apply my-4;
+    }
+    .prose-doc h2 {
+        @apply mb-3 mt-8 font-display text-xl font-semibold tracking-tighter text-ink;
+    }
+    .prose-doc h3,
+    .prose-doc h4,
+    .prose-doc h5,
+    .prose-doc h6 {
+        @apply mb-2 mt-6 font-display text-base font-semibold tracking-tighter text-ink;
+    }
+    .prose-doc ul,
+    .prose-doc ol {
+        @apply my-4 space-y-2 ps-5;
+    }
+    .prose-doc ul {
+        list-style: none;
+    }
+    /* Custom marker keeps list bullets on the accent instead of browser grey. */
+    .prose-doc ul > li {
+        @apply relative ps-4;
+    }
+    .prose-doc ul > li::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0.65em;
+        width: 5px;
+        height: 5px;
+        border-radius: 999px;
+        background: rgb(34 211 238 / 0.7);
+    }
+    .prose-doc ol {
+        list-style: decimal;
+    }
+    .prose-doc ol > li::marker {
+        @apply font-mono text-[12px] text-flux;
+    }
+    .prose-doc li {
+        @apply text-ink-dim;
+    }
+    .prose-doc strong,
+    .prose-doc b {
+        @apply font-semibold text-ink;
+    }
+    .prose-doc a {
+        @apply text-flux underline underline-offset-2 transition-colors hover:text-flux-soft;
+    }
+    .prose-doc blockquote {
+        @apply my-5 border-s-2 border-flux/40 ps-4 italic text-ink-faint;
+    }
+    .prose-doc code {
+        @apply rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[13px] text-flux;
+    }
+    .prose-doc pre {
+        @apply my-5 overflow-x-auto rounded-xl border border-hairline bg-void-200/70 p-4 font-mono text-[13px] text-ink-dim;
+    }
+    .prose-doc pre code {
+        @apply bg-transparent p-0 text-inherit;
+    }
+    .prose-doc hr {
+        @apply my-7 border-0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.24), transparent);
+    }
+
     /* --- Skeleton --------------------------------------------------- */
     .skeleton {
         @apply rounded-lg bg-void-300;
