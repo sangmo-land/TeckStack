@@ -49,6 +49,8 @@ public function edit($id)
         
         return Inertia::render('Courses/Edit', [
             'course' => $course,
+            // Chapter hierarchy for the editor's content section.
+            'hierarchy' => $course->hierarchyPayload(),
         ]);
     }
     

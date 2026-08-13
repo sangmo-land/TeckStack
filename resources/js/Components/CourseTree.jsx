@@ -290,7 +290,10 @@ function TreeNode({ node, depth = 0, defaultOpen = false, canEdit = true }) {
     );
 }
 
-export default function CourseTree({ course, canEdit = true }) {
+const DEFAULT_SHELL =
+    'rounded-2xl bg-white p-6 text-gray-900 shadow-sm ring-1 ring-gray-100 dark:bg-gray-900 dark:text-gray-50 dark:ring-gray-800';
+
+export default function CourseTree({ course, canEdit = true, className = DEFAULT_SHELL }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [chapterTitle, setChapterTitle] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -334,7 +337,7 @@ export default function CourseTree({ course, canEdit = true }) {
     };
 
     return (
-        <div className="rounded-2xl bg-white p-6 text-gray-900 shadow-sm ring-1 ring-gray-100 dark:bg-gray-900 dark:text-gray-50 dark:ring-gray-800">
+        <div className={className}>
             <div className="flex items-center justify-between">
                 <div>
                     <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">Hierarchy</p>

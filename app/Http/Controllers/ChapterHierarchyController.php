@@ -11,7 +11,7 @@ class ChapterHierarchyController extends Controller
 {
     /**
      * Only the course's own instructor (or an admin) may reshape its chapters.
-     * The hierarchy tool is reachable from the teaching dashboard now, so these
+     * The hierarchy tool is reachable from the course editor now, so these
      * endpoints can no longer assume the caller is an admin.
      */
     private function authorizeCourse(int $courseId): void
@@ -30,17 +30,20 @@ class ChapterHierarchyController extends Controller
     }
 
     /**
-     * Send the user back to whichever dashboard they launched the action from.
+     * The hierarchy tool lives on more than one page (admin dashboard, course
+     * editor), so return the user to whichever one launched the action rather
+     * than always bouncing them to the dashboard.
      */
-    private function backToDashboard(int $courseId)
+    private function backToOrigin(int $courseId)
     {
-        $previousPath = parse_url(url()->previous(), PHP_URL_PATH) ?? '';
+        $previous = url()->previous();
+        $previousPath = parse_url($previous, PHP_URL_PATH) ?: '';
 
-        $route = str_starts_with($previousPath, '/instructor/dashboard')
-            ? 'instructor.dashboard'
-            : 'dashboard';
+        if ($previousPath === '' || $previousPath === '/') {
+            return redirect()->route('dashboard', ['course_id' => $courseId]);
+        }
 
-        return redirect()->route($route, ['course_id' => $courseId]);
+        return redirect()->to($previous);
     }
 
     public function create(Request $request)
@@ -72,7 +75,7 @@ class ChapterHierarchyController extends Controller
                 'order' => $order,
             ]);
 
-            return $this->backToDashboard($data['course_id'])
+            return $this->backToOrigin($data['course_id'])
                 ->with('status', "Chapter '{$newChapter->title}' created successfully");
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Failed to create chapter: ' . $e->getMessage()]);
@@ -106,7 +109,7 @@ class ChapterHierarchyController extends Controller
             'child_after' => $chapter->insertSubBelow($payload),
         };
 
-        return $this->backToDashboard($chapter->course_id)
+        return $this->backToOrigin($chapter->course_id)
             ->with('status', "Chapter '{$newChapter->title}' added");
     }
 
@@ -145,7 +148,7 @@ class ChapterHierarchyController extends Controller
 
         $chapter->delete();
 
-        return $this->backToDashboard($courseId)
+        return $this->backToOrigin($courseId)
             ->with('status', "Chapter '{$chapterTitle}' deleted successfully");
     }
 }

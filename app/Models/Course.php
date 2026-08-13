@@ -114,4 +114,36 @@ class Course extends Model
     {
         return $this->reviews()->count();
     }
+
+    /**
+     * The course plus its nested chapter tree, shaped for the CourseTree widget
+     * used by the admin dashboard and the course editor.
+     */
+    public function hierarchyPayload(): array
+    {
+        $this->loadMissing(['rootChapters' => fn ($query) => $query->orderBy('order')->with('allChildren')]);
+
+        $chapterMapper = function ($chapter) use (&$chapterMapper) {
+            return [
+                'id' => $chapter->id,
+                'title' => $chapter->title,
+                'description' => $chapter->description,
+                'full_number' => $chapter->full_number,
+                'is_published' => $chapter->is_published,
+                'is_free' => $chapter->is_free,
+                'duration_minutes' => $chapter->duration_minutes,
+                'order' => $chapter->order,
+                'children' => collect($chapter->allChildren ?? [])->map($chapterMapper)->values(),
+            ];
+        };
+
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'category' => $this->category,
+            'level' => $this->level,
+            'thumbnail_url' => $this->thumbnail_url,
+            'chapters' => collect($this->rootChapters ?? [])->map($chapterMapper)->values(),
+        ];
+    }
 }

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { usePage, useForm, Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import CourseTree from '@/Components/CourseTree';
 import { BookOpen, Plus, X, AlertCircle } from 'lucide-react';
 
-export default function EditCourse({ course }) {
+export default function EditCourse({ course, hierarchy }) {
     const { user } = usePage().props.auth;
     const initialPreview = course.thumbnail_url 
         ? (course.thumbnail_url.startsWith('http') || course.thumbnail_url.startsWith('/storage/') 
@@ -398,6 +399,23 @@ export default function EditCourse({ course }) {
                                 </button>
                             </div>
                         </form>
+
+                        {/* Chapters — kept outside the course form, since the
+                            hierarchy tool posts its own forms. */}
+                        <div className="mt-8">
+                            <div className="mb-4">
+                                <h2 className="text-2xl font-bold text-white">Course Content</h2>
+                                <p className="text-slate-400 mt-1 text-sm">
+                                    Add, nest, and remove chapters. Changes here save immediately —
+                                    they are separate from the course details above.
+                                </p>
+                            </div>
+
+                            <CourseTree
+                                course={hierarchy}
+                                className="rounded-2xl bg-slate-800/50 backdrop-blur-sm border border-slate-700 p-8 text-slate-100"
+                            />
+                        </div>
                     </div>
                 </section>
             </div>
