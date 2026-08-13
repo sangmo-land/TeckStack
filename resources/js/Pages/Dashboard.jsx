@@ -313,9 +313,9 @@ export default function Dashboard() {
                 <>
                     {/* Instructor Header */}
                     <section className="px-4 sm:px-6 lg:px-8 pt-12 pb-8 border-b border-slate-700 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-                        <div className="max-w-7xl mx-auto flex justify-between items-center">
+                        <div className="max-w-7xl mx-auto flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
                             <div>
-                                <h1 className="text-4xl font-bold text-white mb-2">
+                                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
                                     Teaching Dashboard
                                 </h1>
                                 <p className="text-slate-400">
@@ -325,7 +325,7 @@ export default function Dashboard() {
                             </div>
                             <Link
                                 href="/dashboard/create-course"
-                                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                                className="inline-flex flex-none items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                             >
                                 <Plus size={20} /> Create Course
                             </Link>
@@ -428,21 +428,21 @@ export default function Dashboard() {
                                 content.
                             </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                             {(userRole === "instructor" ||
                                 userRole === "admin") && (
                                 <Link
                                     href="/instructor/dashboard"
-                                    className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2"
+                                    className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 flex items-center gap-2 sm:px-4"
                                 >
-                                    <BookOpen className="h-4 w-4" />
+                                    <BookOpen className="h-4 w-4 flex-none" />
                                     Teaching Dashboard
                                 </Link>
                             )}
-                            <button className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+                            <button className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 sm:px-4">
                                 Export
                             </button>
-                            <button className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700">
+                            <button className="rounded-lg bg-primary-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 sm:px-4">
                                 New Report
                             </button>
                         </div>
@@ -475,8 +475,8 @@ export default function Dashboard() {
 
                     <div className="mt-6 grid gap-6 lg:grid-cols-3">
                         <div className="lg:col-span-2 space-y-6">
-                            <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-50 dark:ring-gray-800">
-                                <div className="flex items-center justify-between">
+                            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 text-gray-900 sm:p-6 dark:bg-gray-900 dark:text-gray-50 dark:ring-gray-800">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
                                             Course Hierarchy
@@ -486,7 +486,7 @@ export default function Dashboard() {
                                         </p>
                                     </div>
                                     <select
-                                        className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-50"
+                                        className="w-full max-w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:w-auto sm:max-w-[16rem] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-50"
                                         value={course?.id || ""}
                                         onChange={(e) =>
                                             router.get(
@@ -519,8 +519,8 @@ export default function Dashboard() {
                                 </div>
                             </div>
 
-                            <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-                                <div className="flex items-center justify-between">
+                            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 sm:p-6">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
                                     <div>
                                         <p className="text-sm font-medium text-gray-700">
                                             Engagement Pulse
@@ -623,12 +623,12 @@ export default function Dashboard() {
                                 </div>
                             </div>
 
-                            <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-                                <div className="flex items-center justify-between">
+                            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-100 sm:p-6">
+                                <div className="flex items-center justify-between gap-2">
                                     <p className="text-sm font-medium text-gray-700">
                                         Recent Activity
                                     </p>
-                                    <button className="text-sm font-medium text-primary-600 hover:text-primary-700">
+                                    <button className="flex-none text-sm font-medium text-primary-600 hover:text-primary-700">
                                         View all
                                     </button>
                                 </div>
@@ -636,17 +636,17 @@ export default function Dashboard() {
                                     {activity.map((item) => (
                                         <div
                                             key={item.title}
-                                            className="flex items-start justify-between gap-4"
+                                            className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
                                         >
-                                            <div>
+                                            <div className="min-w-0">
                                                 <p className="text-sm font-semibold text-gray-900">
                                                     {item.title}
                                                 </p>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="break-words text-xs text-gray-500">
                                                     {item.meta}
                                                 </p>
                                             </div>
-                                            <span className="text-xs text-gray-400">
+                                            <span className="flex-none text-xs text-gray-400">
                                                 {item.time}
                                             </span>
                                         </div>

@@ -85,12 +85,9 @@ function TreeNode({ node, depth = 0, defaultOpen = false, canEdit = true }) {
     };
     return (
         <div className="space-y-1">
-            <div
-                className="group relative flex items-start gap-3 rounded-xl px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800"
-                style={{ paddingLeft: `${depth * 1.25}rem` }}
-            >
+            <div className="group relative flex items-start gap-2 rounded-xl px-2 py-2 hover:bg-gray-50 sm:gap-3 sm:px-3 dark:hover:bg-gray-800">
                 <button
-                    className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className="mt-0.5 inline-flex h-6 w-6 flex-none items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-700"
                     onClick={() => setOpen((v) => !v)}
                     aria-label={open ? 'Collapse' : 'Expand'}
                     title={open ? 'Collapse' : 'Expand'}
@@ -102,19 +99,19 @@ function TreeNode({ node, depth = 0, defaultOpen = false, canEdit = true }) {
                     )}
                 </button>
 
-                <div className="flex h-7 w-16 flex-none items-center justify-center rounded-md bg-primary-50 text-primary-700 ring-1 ring-primary-200 dark:bg-primary-950 dark:text-primary-300 dark:ring-primary-900">
-                    <span className="text-sm font-semibold">{node.full_number ?? '—'}</span>
+                <div className="flex h-7 w-12 flex-none items-center justify-center rounded-md bg-primary-50 text-primary-700 ring-1 ring-primary-200 sm:w-16 dark:bg-primary-950 dark:text-primary-300 dark:ring-primary-900">
+                    <span className="text-xs font-semibold sm:text-sm">{node.full_number ?? '—'}</span>
                 </div>
 
-                <div className="flex items-start gap-2">
+                <div className="flex min-w-0 flex-1 items-start gap-2">
                     {hasChildren ? (
-                        <FolderTree className="h-4 w-4 text-primary-600" />
+                        <FolderTree className="h-4 w-4 flex-none text-primary-600" />
                     ) : (
-                        <BookOpen className="h-4 w-4 text-primary-600" />
+                        <BookOpen className="h-4 w-4 flex-none text-primary-600" />
                     )}
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{node.title}</span>
+                    <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="break-words text-sm font-medium text-gray-900 dark:text-gray-100">{node.title}</span>
                             {node.is_published === false && (
                                 <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-800 ring-1 ring-yellow-200 dark:bg-yellow-900 dark:text-yellow-200 dark:ring-yellow-800">Draft</span>
                             )}
@@ -125,10 +122,19 @@ function TreeNode({ node, depth = 0, defaultOpen = false, canEdit = true }) {
                         {node.description && (
                             <p className="mt-0.5 text-xs text-gray-600 line-clamp-2 dark:text-gray-400">{node.description}</p>
                         )}
+                        {/* Duration rides under the title on phones, where the
+                            meta column has no room for it. */}
+                        {node.duration_minutes ? (
+                            <p className="mt-0.5 text-xs text-gray-500 sm:hidden dark:text-gray-400">
+                                {node.duration_minutes} mins
+                            </p>
+                        ) : null}
                     </div>
                 </div>
-                <div className="ml-auto flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                    <span>{node.duration_minutes ? `${node.duration_minutes} mins` : '—'}</span>
+                <div className="flex flex-none items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                    <span className="hidden whitespace-nowrap sm:inline">
+                        {node.duration_minutes ? `${node.duration_minutes} mins` : '—'}
+                    </span>
 
                     {canEdit && (
                         <button
@@ -211,8 +217,8 @@ function TreeNode({ node, depth = 0, defaultOpen = false, canEdit = true }) {
             </div>
 
             {snippetModalOpen && canEdit && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                    <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 text-gray-900 shadow-xl dark:bg-gray-900 dark:text-gray-50">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+                    <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-4 text-gray-900 shadow-xl sm:p-6 dark:bg-gray-900 dark:text-gray-50">
                         <h3 className="mb-4 text-lg font-semibold">Add Code Snippet</h3>
 
                         <div className="space-y-4">
@@ -279,8 +285,11 @@ function TreeNode({ node, depth = 0, defaultOpen = false, canEdit = true }) {
                 </div>
             )}
 
+            {/* Nesting is expressed by indenting the children container rather
+                than by a depth-scaled padding on each row: deep trees stay
+                inside the viewport on phones instead of scrolling sideways. */}
             {hasChildren && open && (
-                <div className="space-y-1">
+                <div className="ml-3 space-y-1 border-l border-gray-200 pl-1 sm:ml-5 sm:pl-2 dark:border-gray-700">
                     {node.children.map((child) => (
                         <TreeNode key={child.id} node={child} depth={depth + 1} defaultOpen={depth < 1} canEdit={canEdit} />
                     ))}
@@ -291,7 +300,7 @@ function TreeNode({ node, depth = 0, defaultOpen = false, canEdit = true }) {
 }
 
 const DEFAULT_SHELL =
-    'rounded-2xl bg-white p-6 text-gray-900 shadow-sm ring-1 ring-gray-100 dark:bg-gray-900 dark:text-gray-50 dark:ring-gray-800';
+    'rounded-2xl bg-white p-4 text-gray-900 shadow-sm ring-1 ring-gray-100 sm:p-6 dark:bg-gray-900 dark:text-gray-50 dark:ring-gray-800';
 
 export default function CourseTree({ course, canEdit = true, className = DEFAULT_SHELL }) {
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -338,12 +347,12 @@ export default function CourseTree({ course, canEdit = true, className = DEFAULT
 
     return (
         <div className={className}>
-            <div className="flex items-center justify-between">
-                <div>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
                     <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">Hierarchy</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">{course.title}</p>
+                    <p className="break-words text-xs text-gray-600 dark:text-gray-300">{course.title}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-none items-center gap-2">
                     {/* With chapters already present, the per-node "+" menu is the only way to
                         add a top-level chapter — this keeps that one click away. */}
                     {canEdit && hasChapters && !showCreateForm && (
