@@ -4,16 +4,53 @@ namespace App\Http\Controllers;
 
 use App\Models\Chapter;
 use App\Models\CodeSnippet;
+use App\Models\Course;
 use Illuminate\Http\Request;
 
 class ChapterHierarchyController extends Controller
 {
+    /**
+     * Only the course's own instructor (or an admin) may reshape its chapters.
+     * The hierarchy tool is reachable from the teaching dashboard now, so these
+     * endpoints can no longer assume the caller is an admin.
+     */
+    private function authorizeCourse(int $courseId): void
+    {
+        $user = auth()->user();
+
+        if ($user->isAdmin()) {
+            return;
+        }
+
+        $ownsCourse = Course::where('id', $courseId)
+            ->where('instructor_id', $user->id)
+            ->exists();
+
+        abort_unless($ownsCourse, 403, 'You can only manage chapters for your own courses.');
+    }
+
+    /**
+     * Send the user back to whichever dashboard they launched the action from.
+     */
+    private function backToDashboard(int $courseId)
+    {
+        $previousPath = parse_url(url()->previous(), PHP_URL_PATH) ?? '';
+
+        $route = str_starts_with($previousPath, '/instructor/dashboard')
+            ? 'instructor.dashboard'
+            : 'dashboard';
+
+        return redirect()->route($route, ['course_id' => $courseId]);
+    }
+
     public function create(Request $request)
     {
         $data = $request->validate([
             'course_id' => 'required|integer|exists:courses,id',
             'title' => 'required|string|max:255',
         ]);
+
+        $this->authorizeCourse($data['course_id']);
 
         try {
             // Get the count of root chapters to determine if this is the first
@@ -35,8 +72,7 @@ class ChapterHierarchyController extends Controller
                 'order' => $order,
             ]);
 
-            return redirect()
-                ->route('dashboard', ['course_id' => $data['course_id']])
+            return $this->backToDashboard($data['course_id'])
                 ->with('status', "Chapter '{$newChapter->title}' created successfully");
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Failed to create chapter: ' . $e->getMessage()]);
@@ -49,6 +85,8 @@ class ChapterHierarchyController extends Controller
             'position' => 'required|in:sibling_before,sibling_after,child_before,child_after',
             'title' => 'required|string|max:255',
         ]);
+
+        $this->authorizeCourse($chapter->course_id);
 
         $payload = [
             'course_id' => $chapter->course_id,
@@ -68,8 +106,7 @@ class ChapterHierarchyController extends Controller
             'child_after' => $chapter->insertSubBelow($payload),
         };
 
-        return redirect()
-            ->route('dashboard', ['course_id' => $chapter->course_id])
+        return $this->backToDashboard($chapter->course_id)
             ->with('status', "Chapter '{$newChapter->title}' added");
     }
 
@@ -80,6 +117,8 @@ class ChapterHierarchyController extends Controller
             'language' => 'required|string|in:javascript,typescript,python,php,html,css,sql,java,cpp,csharp',
             'code' => 'required|string',
         ]);
+
+        $this->authorizeCourse($chapter->course_id);
 
         $maxOrder = CodeSnippet::where('chapter_id', $chapter->id)->max('order');
 
@@ -99,13 +138,14 @@ class ChapterHierarchyController extends Controller
 
     public function destroy(Chapter $chapter)
     {
+        $this->authorizeCourse($chapter->course_id);
+
         $courseId = $chapter->course_id;
         $chapterTitle = $chapter->title;
-        
+
         $chapter->delete();
 
-        return redirect()
-            ->route('dashboard', ['course_id' => $courseId])
+        return $this->backToDashboard($courseId)
             ->with('status', "Chapter '{$chapterTitle}' deleted successfully");
     }
 }

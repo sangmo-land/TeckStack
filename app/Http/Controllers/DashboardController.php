@@ -97,31 +97,7 @@ class DashboardController extends Controller
                 ->first();
         }
 
-        $chapterMapper = function ($chapter) use (&$chapterMapper) {
-            return [
-                'id' => $chapter->id,
-                'title' => $chapter->title,
-                'description' => $chapter->description,
-                'full_number' => $chapter->full_number,
-                'is_published' => $chapter->is_published,
-                'is_free' => $chapter->is_free,
-                'duration_minutes' => $chapter->duration_minutes,
-                'order' => $chapter->order,
-                'children' => collect($chapter->allChildren ?? [])->map($chapterMapper)->values(),
-            ];
-        };
-
-        $coursePayload = null;
-        if ($course) {
-            $coursePayload = [
-                'id' => $course->id,
-                'title' => $course->title,
-                'category' => $course->category,
-                'level' => $course->level,
-                'thumbnail_url' => $course->thumbnail_url,
-                'chapters' => collect($course->rootChapters ?? [])->map($chapterMapper)->values(),
-            ];
-        }
+        $coursePayload = $this->coursePayload($course);
 
         $data = [
             'userRole' => $user->role,
@@ -228,10 +204,10 @@ class DashboardController extends Controller
         ]);
     }
 
-    public function instructorDashboard()
+    public function instructorDashboard(Request $request)
     {
         $user = auth()->user();
-        
+
 if (!$user->isInstructor() && !$user->isAdmin()) {
             abort(403);
         }
@@ -241,11 +217,58 @@ if (!$user->isInstructor() && !$user->isAdmin()) {
         $totalReviews = $courses->sum(fn($c) => $c->reviews()->count());
         $averageRating = $courses->avg(fn($c) => $c->reviews()->avg('rating')) ?? 0;
 
+        // Same chapter-hierarchy tooling the admin dashboard exposes, scoped to
+        // the courses this instructor owns.
+        $courseId = $request->query('course_id');
+
+        $selectedCourse = $user->courses()
+            ->with(['rootChapters' => fn ($query) => $query->orderBy('order')->with('allChildren')])
+            ->when($courseId, fn ($q) => $q->where('id', $courseId))
+            ->orderByDesc('published_at')
+            ->orderBy('id')
+            ->first();
+
         return Inertia::render('Instructor/Dashboard', [
             'courses' => $courses,
             'totalStudents' => $totalStudents,
             'totalReviews' => $totalReviews,
             'averageRating' => round($averageRating, 1),
+            'coursesList' => $courses->map(fn ($c) => ['id' => $c->id, 'title' => $c->title])->values(),
+            'selectedCourse' => $this->coursePayload($selectedCourse),
+            'canEditCourse' => true,
         ]);
+    }
+
+    /**
+     * Shape a course (plus its chapter tree) for the hierarchy widget.
+     */
+    private function coursePayload(?Course $course): ?array
+    {
+        if (!$course) {
+            return null;
+        }
+
+        $chapterMapper = function ($chapter) use (&$chapterMapper) {
+            return [
+                'id' => $chapter->id,
+                'title' => $chapter->title,
+                'description' => $chapter->description,
+                'full_number' => $chapter->full_number,
+                'is_published' => $chapter->is_published,
+                'is_free' => $chapter->is_free,
+                'duration_minutes' => $chapter->duration_minutes,
+                'order' => $chapter->order,
+                'children' => collect($chapter->allChildren ?? [])->map($chapterMapper)->values(),
+            ];
+        };
+
+        return [
+            'id' => $course->id,
+            'title' => $course->title,
+            'category' => $course->category,
+            'level' => $course->level,
+            'thumbnail_url' => $course->thumbnail_url,
+            'chapters' => collect($course->rootChapters ?? [])->map($chapterMapper)->values(),
+        ];
     }
 }

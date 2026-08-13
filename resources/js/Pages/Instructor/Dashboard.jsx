@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Head } from "@inertiajs/react";
+import { Link, Head, router } from "@inertiajs/react";
 import {
     Users,
     Star,
@@ -9,6 +9,7 @@ import {
     BarChart3,
 } from "lucide-react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import CourseTree from "@/Components/CourseTree";
 import Footer from "@/Components/Footer";
 
 export default function InstructorDashboard({
@@ -16,6 +17,9 @@ export default function InstructorDashboard({
     totalStudents,
     totalReviews,
     averageRating,
+    coursesList,
+    selectedCourse,
+    canEditCourse = true,
 }) {
     return (
         <AuthenticatedLayout useMarketingNavbar>
@@ -108,6 +112,63 @@ export default function InstructorDashboard({
                         )}
                     </div>
                 </section>
+
+                {/* Course hierarchy — same chapter tooling as the admin dashboard */}
+                {courses.length > 0 && (
+                    <section className="px-4 sm:px-6 lg:px-8 py-8">
+                        <div className="max-w-7xl mx-auto">
+                            <h2 className="text-2xl font-bold text-white mb-6">
+                                Course Content
+                            </h2>
+
+                            <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-50 dark:ring-gray-800">
+                                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-50">
+                                            Course Hierarchy
+                                        </p>
+                                        <p className="text-xs text-gray-600 dark:text-gray-300">
+                                            Add, nest, and remove chapters for
+                                            your courses
+                                        </p>
+                                    </div>
+                                    <select
+                                        className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-50"
+                                        value={selectedCourse?.id || ""}
+                                        onChange={(e) =>
+                                            router.get(
+                                                route("instructor.dashboard"),
+                                                {
+                                                    course_id:
+                                                        e.target.value ||
+                                                        undefined,
+                                                },
+                                                {
+                                                    preserveState: true,
+                                                    replace: true,
+                                                }
+                                            )
+                                        }
+                                    >
+                                        <option value="">Latest Course</option>
+                                        {coursesList?.map((c) => (
+                                            <option key={c.id} value={c.id}>
+                                                {c.title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="mt-4">
+                                    <CourseTree
+                                        course={selectedCourse}
+                                        canEdit={canEditCourse}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                )}
+
                 <Footer />
             </div>
         </AuthenticatedLayout>
