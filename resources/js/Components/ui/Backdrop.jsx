@@ -250,7 +250,7 @@ function IndexNode({ node, tone = 'base', delay = 0, animated = true }) {
 /**
  * B-tree index backdrop for hero sections.
  */
-export function IndexBackdrop({ className = '', seed = 7, animated = true }) {
+export function IndexBackdrop({ className = '', seed = 7, animated = true, intensity = 1 }) {
     const idx = React.useMemo(() => buildIndex({ seed }), [seed]);
     const { root, internals, leaves, rootEdges, internalEdges, chain, seeks } = idx;
 
@@ -277,7 +277,7 @@ export function IndexBackdrop({ className = '', seed = 7, animated = true }) {
                 {/* ---------- Static structure ----------
                     Deliberately faint. This is wallpaper behind a headline,
                     not a diagram the reader is meant to study. */}
-                <g opacity="0.14">
+                <g opacity={0.085 * intensity}>
                     {[...rootEdges, ...internalEdges].map((e, i) => (
                         <path
                             key={e.key}
@@ -320,7 +320,7 @@ export function IndexBackdrop({ className = '', seed = 7, animated = true }) {
                     by animation-delay so the path illuminates in execution order:
                     root → internal → leaf, then sideways along the chain. */}
                 {animated && (
-                  <g opacity="0.5">
+                  <g opacity={0.28 * intensity}>
                     {seeks.map((seek) =>
                         seek.steps.map((step, i) => {
                             const delay = seek.index * SEEK_SLOT + i * STEP;
